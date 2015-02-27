@@ -11,19 +11,26 @@
     <link href="http://cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.css" rel="stylesheet">
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.js"></script>
 
-    <link rel="stylesheet" href="style.css" />
     <script src="script.js" type="text/javascript"></script>
   </head>
   <body>
     <div ng-controller="AppCtrl">
+      <h3>Model values</h3>
       <p>selectedIds: {{selectedIds | json}}</p>
       <p>selectedId: {{selectedId | json}}</p>
+      <p>user: {{user}}</p>
+
+      <h3>appChosen</h3>
       <p>appChosen: <app-chosen ng-model="selectedIds" app-options="availableOptions"></app-chosen></p>
       <p>appChoseFrom multi: <select style="width: 200px" app-chose-from="availableOptions" ng-model="selectedIds" multiple></select></p>
       <p>appChoseFrom single: <select style="width: 200px" app-chose-from="availableOptions" ng-model="selectedId"></select></p>
+
+      <h3>appChosen2</h3>
       <p>appChosen2 single: <select style="width: 200px" app-chosen2="{watch: 'availableOptions'}" ng-model="selectedId" ng-options="x.id as x.descr for x in availableOptions"></select></p>
       <p>appChosen2 multi: <select style="width: 200px" app-chosen2="{watch: 'availableOptions'}" ng-model="selectedIds" ng-options="x.id as x.descr for x in availableOptions" multiple></select></p>
       <p>appChosen2 single with string array: <select style="width: 200px" app-chosen2="{watch: 'users'}" ng-model="user" ng-options="x for x in users"></select></p>
+
+      <h3>appChosen3 (this is the one i've used the most)</h3>
       <p>appChosen3 single: <select style="width: 200px" app-chosen3="{watch: 'availableOptions'}" ng-model="selectedId" ng-options="x.id as x.descr for x in availableOptions"></select></p>
       <p>appChosen3 multi: <select style="width: 200px" app-chosen3="{watch: 'availableOptions'}" ng-model="selectedIds" ng-options="x.id as x.descr for x in availableOptions" multiple></select></p>
       <p>appChosen3 single with string array: <select style="width: 200px" app-chosen3="{watch: 'users'}" ng-model="user" ng-options="x for x in users"></select></p>
