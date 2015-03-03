@@ -15,7 +15,7 @@ angular.module('app').controller('appMainCtrl', function ($scope) {
     $scope.state = $scope.states[0];
 });
 
-angular.module('app').directive('appTypeahead', function ($parse) {
+angular.module('app').directive('appTypeahead', function () {
     return {
         restrict: 'A',
         require: 'ngModel',
