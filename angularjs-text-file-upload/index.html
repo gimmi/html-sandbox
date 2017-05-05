@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+<head>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>
+    <link href="styles.css" rel="stylesheet">
+    <script src="script.js"></script>
+</head>
+
+<body ng-controller="mainCtrl">
+    <form name="textFileForm">
+        <div ng-class="{ 'form-group': true, 'has-error': textFileForm.description.$invalid }">
+            <label class="control-label">Description</label>
+            <input type="text" class="form-control" name="description" ng-model="model.description" required>
+        </div>
+        <div ng-class="{ 'form-group': true, 'has-error': textFileForm.file.$invalid }">
+            <label class="control-label">File</label>
+            <input type="file" name="file" ng-model="model.file" text-file-reader required />
+        </div>
+        <button type="submit" class="btn btn-primary" ng-disabled="textFileForm.$invalid">Ok</button>
+    </form>
+
+    <pre>{{model | json}}</pre>
+</body>
+
+</html>
