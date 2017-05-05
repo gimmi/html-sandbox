@@ -16,7 +16,7 @@
         </div>
         <div ng-class="{ 'form-group': true, 'has-error': textFileForm.file.$invalid }">
             <label class="control-label">File</label>
-            <input type="file" name="file" ng-model="model.file" text-file-reader required />
+            <input type="file" name="file" ng-model="model.file" text-file-reader required>
         </div>
         <button type="submit" class="btn btn-primary" ng-disabled="textFileForm.$invalid">Ok</button>
     </form>
