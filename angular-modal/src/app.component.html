@@ -1,6 +1,6 @@
 <h3>Dialog Sample</h3>
 
-<button type="button" class="btn btn-primary" (click)="openDialog()">Open</button>
+<button type="button" class="btn btn-primary" (click)="onOpenClick()">Open</button>
 
 <app-modal (cancel)="onModalCancel()">
     <div class="modal-header">
@@ -9,9 +9,10 @@
     </div>
     <div class="modal-body">
         <p>This is the content</p>
+        <input type="text" class="form-control" appModalFocus>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" (click)="okModal()">Ok</button>
+        <button type="submit" class="btn btn-primary" (click)="onModalOk()">Ok</button>
     </div>
 </app-modal>
 

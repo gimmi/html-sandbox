@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms'
 
 import AppComponent from './app.component'
 import AppModalComponent from './app-modal.component'
+import AppModalFocusDirective from './app-modal-focus.directive'
 
 export default NgModule({
     imports: [
@@ -18,7 +19,8 @@ export default NgModule({
     ],
     declarations: [
         AppComponent,
-        AppModalComponent
+        AppModalComponent,
+        AppModalFocusDirective
     ],
     providers: [
     ]
