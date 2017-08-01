@@ -1,0 +1,5 @@
+/* See http://stackoverflow.com/a/33596636/66629 */
+a.unstyled, a.unstyled:link, a.unstyled:hover {
+    color: inherit;
+    text-decoration: inherit;
+}
