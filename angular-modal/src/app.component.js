@@ -22,18 +22,17 @@ export default Component({
     }],
 
     onOpenClick: function() {
-        var me = this
-        me.appDialog.open().then(function(ret) {
-            me.logs.push('Dialog closed with value: ' + ret)
-        })
-        me.logs.push('Dialog open')
+        this.appDialog.open()
+        this.logs.push('Dialog open')
     },
 
     onModalOk: function() {
-        this.appDialog.close(true)
+        this.appDialog.close()
+        this.logs.push('Dialog confirmed')
     },
 
     onModalCancel: function() {
-        this.appDialog.close(false)
+        this.appDialog.close()
+        this.logs.push('Dialog canceled')
     }
 })

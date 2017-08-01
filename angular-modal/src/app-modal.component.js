@@ -22,30 +22,32 @@ export default Component({
 }).Class({
     constructor: [function AppModalComponent() {
         // Inspired by http://blog.angular-university.io/angular-ng-content/
+        // And https://stackoverflow.com/a/40144809/66629
 
         this.cancel = new EventEmitter()
 
-        this.resolve = null
+        this.isOpen = false
         this.timeoutId = null
         this.modalClass = 'modal fade'
     }],
 
     open: function() {
         var me = this
-        if (me.appModalFocus) {
-            me.appModalFocus.scheduleFocus()
+        if (!me.isOpen) {
+            if (me.appModalFocus) {
+                me.appModalFocus.scheduleFocus()
+            }
+            me.modalClass = 'modal fade app-modal'
+            clearTimeout(me.timeoutId)
+            me.timeoutId = setTimeout(function() { me.modalClass = 'modal fade app-modal in' }, 100);
+            me.isOpen = true
         }
-        me.modalClass = 'modal fade app-modal'
-        clearTimeout(me.timeoutId)
-        me.timeoutId = setTimeout(function() { me.modalClass = 'modal fade app-modal in' }, 100);
-        return new Promise(function(resolve) { me.resolve = resolve })
     },
 
     close: function(value) {
         var me = this
-        if (me.resolve) {
-            me.resolve(value)
-            me.resolve = null
+        if (me.isOpen) {
+            me.isOpen = false
             me.modalClass = 'modal fade app-modal'
             clearTimeout(me.timeoutId)
             me.timeoutId = setTimeout(function() { me.modalClass = 'modal fade' }, 300);
