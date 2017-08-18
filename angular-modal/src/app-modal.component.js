@@ -55,7 +55,7 @@ export default Component({
     },
 
     onOverlayKeydown: function(event) {
-        if (event.key === 'Escape') {
+        if (event.key === 'Escape' || event.key === 'Esc') {
             event.stopPropagation()
             this.cancel.emit({})
         }
