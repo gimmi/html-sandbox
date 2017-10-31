@@ -26,9 +26,13 @@
             <input type="text" class="form-control" ng-model="model.value">
         </div>
 
+        <div class="form-group">
+            <label class="control-label">model.value (with app-model-handler)</label>
+            <input type="text" class="form-control" ng-model="model.value" app-model-handler="fn">
+        </div>
+
         <pre>{{model | json : 4}}</pre>
 
-        <app-excel-cell-cmp ng-model="model.value"></app-excel-cell-cmp>
     </div>
 
 </body>
