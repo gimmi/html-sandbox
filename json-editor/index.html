@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            html, body {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+            }
+        </style>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', async () => {
+                const updateEl = document.getElementById('update')
+                const editorEl = document.getElementById('editor')
+                const apiUrl = window.location.origin + '/api' + window.location.pathname;
+
+                const getResp = await fetch(apiUrl)
+                if (!getResp.ok) {
+                    window.alert(`HTTP ${getResp.status} ${getResp.statusText}`)
+                    return;
+                }
+
+                editorEl.value = getResp.text()
+
+                updateEl.addEventListener('click', async () => {
+                    const putResp = await fetch(apiUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: editorEl.value
+                    })
+
+                    if (!putResp.ok) {
+                        window.alert(`HTTP ${getResp.status} ${getResp.statusText}`)
+                    }
+                });
+            })
+        </script>
+    </head>
+    <body>
+        <div style="height: 100%; display: flex; flex-flow: column nowrap;">
+            <div style="flex: 0 1 auto; margin: .5em; display: flex; flex-flow: row-reverse nowrap;">
+                <button id="update" type="button" style="flex: 0 1 auto; font-size: larger;">Update</button>
+            </div>
+            <textarea id="editor" style="flex: 1 1 auto; margin: 0 .5em .5em .5em; padding: .5em; resize: none;" autocomplete="off"></textarea>
+        </div>
+    </body>
+</html>
