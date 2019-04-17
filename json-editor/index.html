@@ -9,11 +9,17 @@
                 margin: 0;
             }
         </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
         <script type="text/javascript">
             document.addEventListener('DOMContentLoaded', async () => {
                 const updateEl = document.getElementById('update')
                 const editorEl = document.getElementById('editor')
                 const apiUrl = window.location.origin + '/api' + window.location.pathname;
+
+                const editor = ace.edit(editorEl, {
+                    mode: 'ace/mode/json',
+                    showLineNumbers: false
+                });
 
                 const getResp = await fetch(apiUrl)
                 if (!getResp.ok) {
@@ -21,7 +27,8 @@
                     return;
                 }
 
-                editorEl.value = getResp.text()
+                const value = await getResp.text();
+                editor.session.setValue(value);
 
                 updateEl.addEventListener('click', async () => {
                     const putResp = await fetch(apiUrl, {
@@ -29,7 +36,7 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: editorEl.value
+                        body: editor.session.getValue()
                     })
 
                     if (!putResp.ok) {
@@ -44,7 +51,7 @@
             <div style="flex: 0 1 auto; margin: .5em; display: flex; flex-flow: row-reverse nowrap;">
                 <button id="update" type="button" style="flex: 0 1 auto; font-size: larger;">Update</button>
             </div>
-            <textarea id="editor" style="flex: 1 1 auto; margin: 0 .5em .5em .5em; padding: .5em; resize: none;" autocomplete="off"></textarea>
+            <div id="editor" style="flex: 1 1 auto; margin: 0 .5em .5em .5em; border: 1px solid lightgray;"></div>
         </div>
     </body>
 </html>
