@@ -1,24 +1,23 @@
-Validator = function () {
+Validator = function (contextObject, hierarchy) {
     "use strict";
 
-    var _hierarchy = [],
-        _contextObject = {},
+    if (isNullOrUndefined(contextObject)) {
+        throw 'Invalid context object'
+    }
+
+    if (!isArray(hierarchy)) {
+        hierarchy = [hierarchy]
+    }
+
+    var _hierarchy = hierarchy,
+        _contextObject = contextObject,
         _validatedFields = [],
         _this = Object.assign(this, {
-            reset: reset,
             pushContext: pushContext,
             popContext: popContext,
             check: check,
         });
 
-
-    function reset(contextObject, description) {
-        _hierarchy = [];
-        _contextObject = {};
-        _validatedFields = [];
-
-        return pushContext(contextObject, description)
-    }
 
     function pushContext(contextObject, description) {
         if (isNullOrUndefined(contextObject)) {
