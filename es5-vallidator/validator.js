@@ -1,25 +1,30 @@
 Validator = function (contextObject, hierarchy) {
     "use strict";
 
-    if (is(contextObject, 'Null', 'Undefined')) {
-        throw 'Invalid context object'
-    }
+    // if (is(contextObject, 'Null', 'Undefined')) {
+    //     throw 'Invalid context object'
+    // }
 
-    if (!is(hierarchy, 'Array')) {
-        hierarchy = [hierarchy]
-    }
+    // if (!is(hierarchy, 'Array')) {
+    //     hierarchy = [hierarchy]
+    // }
 
     var _hierarchy = hierarchy,
         _contextObject = contextObject,
         _this = Object.assign(this, {
+            checkField: checkField,
             check: check,
         });
 
-    function check(fieldName, options, nestedFn) {
-        var val = _contextObject[fieldName];
+    function checkField(fieldName, options, nestedFn) {
 
-        _hierarchy.push(fieldName);
+        new Validator(_contextObject[fieldName], _hierarchy.concat(fieldName))
+            .check(options, nestedFn);
 
+        return _this
+    }
+
+    function check(options, nestedFn) {
         if (!is(options, 'Object')) {
             options = { req: true, type: options }
         }
@@ -28,24 +33,23 @@ Validator = function (contextObject, hierarchy) {
             options.req = true;
         }
 
-        if (is(val, 'Null', 'Undefined')) {
+        if (is(_contextObject, 'Null', 'Undefined')) {
             if (options.req) {
                 error('required but missing')
             } else {
-                _hierarchy.pop()
-                return _this
+                return
             }
         }
 
-        if (options.req && is(val, 'Null', 'Undefined')) {
+        if (options.req && is(_contextObject, 'Null', 'Undefined')) {
             error('required but missing')
         }
 
         if (options.type === String) {
-            if (!is(val, 'String')) {
+            if (!is(_contextObject, 'String')) {
                 error('Expected String')
             }
-            var length = val.length;
+            var length = _contextObject.length;
             if (is(options.min, 'Number') && length < options.min) {
                 error('Expected length >= ', options.min, ' but is ', length)
             }
@@ -53,28 +57,28 @@ Validator = function (contextObject, hierarchy) {
                 error('Expected length <= ', options.max, ' but is ', length)
             }
         } else if (options.type === Number) {
-            if (!is(val, 'Number')) {
+            if (!is(_contextObject, 'Number')) {
                 error('Expected Number')
             }
-            if (is(options.min, 'Number') && val < options.min) {
-                error('Expected >= ', options.min, ' but is ', val)
+            if (is(options.min, 'Number') && _contextObject < options.min) {
+                error('Expected >= ', options.min, ' but is ', _contextObject)
             }
-            if (is(options.max, 'Number') && val > options.max) {
-                error('Expected <= ', options.max, ' but is ', val)
+            if (is(options.max, 'Number') && _contextObject > options.max) {
+                error('Expected <= ', options.max, ' but is ', _contextObject)
             }
         } else if (options.type === Boolean) {
-            if (!is(val, 'Boolean')) {
+            if (!is(_contextObject, 'Boolean')) {
                 error('Expected Boolean')
             }
         } else if (options.type === Object) {
-            if (!is(val, 'Object')) {
+            if (!is(_contextObject, 'Object')) {
                 error('Expected Object')
             }
 
-            if (is(options.size, 'Number') && Object.keys(val).length !== options.size) {
-                error('Expected size ', options.size, ' but size is ', val.length)
+            if (is(options.size, 'Number') && Object.keys(_contextObject).length !== options.size) {
+                error('Expected size ', options.size, ' but size is ', _contextObject.length)
             }
-            var length = Object.keys(val).length;
+            var length = Object.keys(_contextObject).length;
             if (is(options.min, 'Number') && length < options.min) {
                 error('Expected length >= ', options.min, ' but is ', length)
             }
@@ -82,11 +86,11 @@ Validator = function (contextObject, hierarchy) {
                 error('Expected length <= ', options.max, ' but is ', length)
             }
         } else if (options.type === Array) {
-            if (!is(val, 'Array')) {
+            if (!is(_contextObject, 'Array')) {
                 error('Expected Array')
             }
 
-            var length = val.length;
+            var length = _contextObject.length;
             if (is(options.min, 'Number') && length < options.min) {
                 error('Expected length >= ', options.min, ' but is ', length)
             }
@@ -97,23 +101,20 @@ Validator = function (contextObject, hierarchy) {
             error('Unknown type "', options.type, '"')
         }
 
-        if (is(options.enum, 'Array') && options.enum.indexOf(val) === -1) {
-            error('"', val, '" not in ', JSON.stringify(options.enum))
+        if (is(options.enum, 'Array') && options.enum.indexOf(_contextObject) === -1) {
+            error('"', _contextObject, '" not in ', JSON.stringify(options.enum))
         }
 
-        if (is(nestedFn, 'Function') && is(val, 'Array')) {
-            val.forEach(function (nestedVal, nestedIndex) {
+        if (is(nestedFn, 'Function') && is(_contextObject, 'Array')) {
+            _contextObject.forEach(function (nestedVal, nestedIndex) {
                 var nestedHierarchy = _hierarchy.concat(nestedIndex);
                 var nestedValidator = new Validator(nestedVal, nestedHierarchy);
                 nestedFn(nestedValidator, nestedVal)
             })
-        } else if (is(nestedFn, 'Function') && is(val, 'Object')) {
-            var nestedValidator = new Validator(val, _hierarchy);
-            nestedFn(nestedValidator, val)
+        } else if (is(nestedFn, 'Function') && is(_contextObject, 'Object')) {
+            var nestedValidator = new Validator(_contextObject, _hierarchy);
+            nestedFn(nestedValidator, _contextObject)
         }
-
-        _hierarchy.pop()
-        return _this
     }
 
     function error(/* msg... */) {
