@@ -12,7 +12,6 @@ describe("Player", function() {
             .check('aNumber', Number)
             .check('aBoolean', Boolean)
             .check('anArray', Array)
-            .popContext()
 
         expect().nothing();
     });

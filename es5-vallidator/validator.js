@@ -12,28 +12,8 @@ Validator = function (contextObject, hierarchy) {
     var _hierarchy = hierarchy,
         _contextObject = contextObject,
         _this = Object.assign(this, {
-            pushContext: pushContext,
-            popContext: popContext,
             check: check,
         });
-
-
-    function pushContext(contextObject, description) {
-        if (is(contextObject, 'Null', 'Undefined')) {
-            error('Invalid context object')
-        }
-
-        _contextObject = contextObject;
-        _hierarchy.push(description);
-
-        return _this
-    }
-
-    function popContext() {
-        _hierarchy.pop()
-
-        return _this
-    }
 
     function check(fieldName, options, nestedFn) {
         var val = _contextObject[fieldName];
