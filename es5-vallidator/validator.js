@@ -8,9 +8,8 @@ Validator = function (value, hierarchy) {
             checkField: checkField,
         });
 
-    function checkField(fieldName, options, nestedFn) {
-
-        new Validator(_value[fieldName], _hierarchy.concat(fieldName))
+    function checkField(name, options, nestedFn) {
+        new Validator(_value[name], _hierarchy.concat(name))
             .check(options, nestedFn);
 
         return _this

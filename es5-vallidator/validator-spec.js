@@ -66,19 +66,21 @@ describe("Player", function() {
                 }
             }]
         }
-        new Validator(tree).check(Object)
-            .checkField('id', String)
-            .checkField('ary', Array, function (validator, value) {
-                expect(value.id).toBe('ary1');
-                validator.check(Object)
-                validator.checkField('id', String)
-                    .checkField('obj', Object, function (validator, value) {
-                        expect(value.id).toBe('obj');
-                        validator.checkField('id', String)
-                        expect(function () {
-                            validator.checkField('name', String)
-                        }).toThrow('/ary/0/obj/name: required but missing')
-                    })
-            })
+        new Validator(tree).check(Object, function (validator, value) {
+            expect(value.id).toBe('/');
+            validator.checkField('id', String)
+                .checkField('ary', Array, function (validator, value) {
+                    expect(value.id).toBe('ary1');
+                    validator.check(Object)
+                    validator.checkField('id', String)
+                        .checkField('obj', Object, function (validator, value) {
+                            expect(value.id).toBe('obj');
+                            validator.checkField('id', String)
+                            expect(function () {
+                                validator.checkField('name', String)
+                            }).toThrow('/ary/0/obj/name: required but missing')
+                        })
+                })
+        })
     });
 });
