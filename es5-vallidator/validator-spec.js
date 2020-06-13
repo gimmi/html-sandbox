@@ -56,4 +56,29 @@ describe("Player", function() {
             new Validator({ str: 'V3' }, 'data').check('str', { enum: ['V1', 'V2'] })
         }).toThrow('data/str: "V3" not in ["V1","V2"]');
     });
+
+    it('Should navigate tree', function() {
+        var tree = {
+            id: '/',
+            ary: [{
+                id: 'ary1',
+                obj: {
+                    id: 'obj',
+                }
+            }]
+        }
+        new Validator(tree, 'tree')
+            .check('id', String)
+            .check('ary', Array, function (validator, value) {
+                expect(value.id).toBe('ary1');
+                validator.check('id', String)
+                    .check('obj', Object, function (validator, value) {
+                        expect(value.id).toBe('obj');
+                        validator.check('id', String)
+                        expect(function () {
+                            validator.check('name', String)
+                        }).toThrow('tree/ary/0/obj/name: required but missing')
+                    })
+            })
+    });
 });

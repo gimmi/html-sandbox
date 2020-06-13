@@ -37,7 +37,7 @@ Validator = function (contextObject, hierarchy) {
         return _this
     }
 
-    function check(fieldName, options, forEachFn) {
+    function check(fieldName, options, nestedFn) {
         var val = _contextObject[fieldName];
 
         if (!is(options, 'Object')) {
@@ -122,15 +122,17 @@ Validator = function (contextObject, hierarchy) {
 
         _validatedFields.push(fieldName);
 
-        // if (is(forEachFn, 'Function') && is(val, 'Array', 'Object')) {
-        //     var nestedValidator = new Validator(val, _hierarchy.concat(fieldName)),
-                
-        //     if (is(val, 'Array')) {
-        //         val.forEach(function (nestedVal, nestedFieldName) { forEachFn(nestedValidator, nestedVal, nestedFieldName) })
-        //     } else {
-        //         Object.keys(val)
-        //     }
-        // }
+        if (is(nestedFn, 'Function') && is(val, 'Array')) {
+            val.forEach(function (nestedVal, nestedIndex) {
+                var nestedHierarchy = _hierarchy.concat(fieldName).concat(nestedIndex);
+                var nestedValidator = new Validator(nestedVal, nestedHierarchy);
+                nestedFn(nestedValidator, nestedVal)
+            })
+        } else if (is(nestedFn, 'Function') && is(val, 'Object')) {
+            var nestedHierarchy = _hierarchy.concat(fieldName);
+            var nestedValidator = new Validator(val, nestedHierarchy);
+            nestedFn(nestedValidator, val)
+        }
 
         return _this
     }
