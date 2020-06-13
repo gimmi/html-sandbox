@@ -1,14 +1,6 @@
 Validator = function (value, hierarchy) {
     "use strict";
 
-    // if (is(value, 'Null', 'Undefined')) {
-    //     throw 'Invalid context object'
-    // }
-
-    // if (!is(hierarchy, 'Array')) {
-    //     hierarchy = [hierarchy]
-    // }
-
     var _value = value,
         _hierarchy = hierarchy || [''],
         _this = Object.assign(this, {
