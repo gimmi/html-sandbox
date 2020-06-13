@@ -9,11 +9,11 @@ Validator = function (value, hierarchy) {
     //     hierarchy = [hierarchy]
     // }
 
-    var _hierarchy = hierarchy,
-        _value = value,
+    var _value = value,
+        _hierarchy = hierarchy || [''],
         _this = Object.assign(this, {
-            checkField: checkField,
             check: check,
+            checkField: checkField,
         });
 
     function checkField(fieldName, options, nestedFn) {
@@ -37,7 +37,7 @@ Validator = function (value, hierarchy) {
             if (options.req) {
                 error('required but missing')
             } else {
-                return
+                return _this
             }
         }
 
@@ -105,15 +105,19 @@ Validator = function (value, hierarchy) {
             error('"', _value, '" not in ', JSON.stringify(options.enum))
         }
 
-        if (is(nestedFn, 'Function') && is(_value, 'Array')) {
-            _value.forEach(function (nestedVal, nestedIndex) {
-                var nestedHierarchy = _hierarchy.concat(nestedIndex);
-                var nestedValidator = new Validator(nestedVal, nestedHierarchy);
-                nestedFn(nestedValidator, nestedVal)
-            })
-        } else if (is(nestedFn, 'Function') && is(_value, 'Object')) {
-            nestedFn(_this, _value)
+        if (is(nestedFn, 'Function')) {
+            if (is(_value, 'Array')) {
+                _value.forEach(function (nestedVal, nestedIndex) {
+                    var nestedHierarchy = _hierarchy.concat(nestedIndex);
+                    var nestedValidator = new Validator(nestedVal, nestedHierarchy);
+                    nestedFn(nestedValidator, nestedVal)
+                })
+            } else {
+                nestedFn(_this, _value)
+            }
         }
+
+        return _this
     }
 
     function error(/* msg... */) {
