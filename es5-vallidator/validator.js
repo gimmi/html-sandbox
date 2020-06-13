@@ -1,26 +1,23 @@
-
-validator = (function () {
+Validator = function () {
     "use strict";
 
     var _hierarchy = [],
         _contextObject = {},
-        _validatedFields = [];
+        _validatedFields = [],
+        _this = Object.assign(this, {
+            reset: reset,
+            pushContext: pushContext,
+            popContext: popContext,
+            check: check,
+        });
 
-    return {
-        reset: reset,
-        pushContext: pushContext,
-        popContext: popContext,
-        check: check
-    }
 
     function reset(contextObject, description) {
         _hierarchy = [];
         _contextObject = {};
         _validatedFields = [];
 
-        pushContext(contextObject, description)
-
-        return this
+        return pushContext(contextObject, description)
     }
 
     function pushContext(contextObject, description) {
@@ -32,16 +29,16 @@ validator = (function () {
         _hierarchy.push(description);
         _validatedFields = [];
 
-        return this
+        return _this
     }
 
     function popContext() {
         _hierarchy.pop()
 
-        return this
+        return _this
     }
 
-    function check(fieldName, options) {
+    function check(fieldName, options, forEachFn) {
         var val = _contextObject[fieldName];
 
         if (!isObject(options)) {
@@ -56,7 +53,7 @@ validator = (function () {
             if (options.req) {
                 error(fieldName, ': required but missing')
             } else {
-                return this
+                return _this
             }
         }
 
@@ -126,19 +123,7 @@ validator = (function () {
 
         _validatedFields.push(fieldName);
 
-        return this
-    }
-
-    function wrapInContext(description, fn) {
-        pushContext(_contextObject, fieldName)
-        try {
-            fn()
-        } catch(ex) {
-            popContext()
-            throw ex
-        }
-        popContext()
-        return this
+        return _this
     }
 
     function error(/*...*/) {
@@ -174,5 +159,4 @@ validator = (function () {
     function isRegExp(value) {
         return Object.prototype.toString.call(value) === '[object RegExp]'
     }
-
-})();
+};

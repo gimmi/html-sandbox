@@ -1,10 +1,9 @@
 describe("Player", function() {
-    var player;
-    var song;
+    var validator;
 
-    // beforeEach(function() {
-    //   validator.reset()
-    // });
+    beforeEach(function() {
+      validator = new Validator();
+    });
 
     it('Should validate valid props', function() {
         var data = {
