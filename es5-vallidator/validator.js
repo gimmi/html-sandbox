@@ -11,7 +11,6 @@ Validator = function (contextObject, hierarchy) {
 
     var _hierarchy = hierarchy,
         _contextObject = contextObject,
-        _validatedFields = [],
         _this = Object.assign(this, {
             pushContext: pushContext,
             popContext: popContext,
@@ -26,7 +25,6 @@ Validator = function (contextObject, hierarchy) {
 
         _contextObject = contextObject;
         _hierarchy.push(description);
-        _validatedFields = [];
 
         return _this
     }
@@ -40,6 +38,8 @@ Validator = function (contextObject, hierarchy) {
     function check(fieldName, options, nestedFn) {
         var val = _contextObject[fieldName];
 
+        _hierarchy.push(fieldName);
+
         if (!is(options, 'Object')) {
             options = { req: true, type: options }
         }
@@ -50,96 +50,95 @@ Validator = function (contextObject, hierarchy) {
 
         if (is(val, 'Null', 'Undefined')) {
             if (options.req) {
-                error(fieldName, ': required but missing')
+                error('required but missing')
             } else {
+                _hierarchy.pop()
                 return _this
             }
         }
 
         if (options.req && is(val, 'Null', 'Undefined')) {
-            error(fieldName, ': required but missing')
+            error('required but missing')
         }
 
         if (options.type === String) {
             if (!is(val, 'String')) {
-                error(fieldName, ': Expected String')
+                error('Expected String')
             }
             var length = val.length;
             if (is(options.min, 'Number') && length < options.min) {
-                error(fieldName, ': Expected length >= ', options.min, ' but is ', length)
+                error('Expected length >= ', options.min, ' but is ', length)
             }
             if (is(options.max, 'Number') && length > options.max) {
-                error(fieldName, ': Expected length <= ', options.max, ' but is ', length)
+                error('Expected length <= ', options.max, ' but is ', length)
             }
         } else if (options.type === Number) {
             if (!is(val, 'Number')) {
-                error(fieldName, ': Expected Number')
+                error('Expected Number')
             }
             if (is(options.min, 'Number') && val < options.min) {
-                error(fieldName, ': Expected >= ', options.min, ' but is ', val)
+                error('Expected >= ', options.min, ' but is ', val)
             }
             if (is(options.max, 'Number') && val > options.max) {
-                error(fieldName, ': Expected <= ', options.max, ' but is ', val)
+                error('Expected <= ', options.max, ' but is ', val)
             }
         } else if (options.type === Boolean) {
             if (!is(val, 'Boolean')) {
-                error(fieldName, ': Expected Boolean')
+                error('Expected Boolean')
             }
         } else if (options.type === Object) {
             if (!is(val, 'Object')) {
-                error(fieldName, ': Expected Object')
+                error('Expected Object')
             }
 
             if (is(options.size, 'Number') && Object.keys(val).length !== options.size) {
-                error(fieldName, ': Expected size ', options.size, ' but size is ', val.length)
+                error('Expected size ', options.size, ' but size is ', val.length)
             }
             var length = Object.keys(val).length;
             if (is(options.min, 'Number') && length < options.min) {
-                error(fieldName, ': Expected length >= ', options.min, ' but is ', length)
+                error('Expected length >= ', options.min, ' but is ', length)
             }
             if (is(options.max, 'Number') && length > options.max) {
-                error(fieldName, ': Expected length <= ', options.max, ' but is ', length)
+                error('Expected length <= ', options.max, ' but is ', length)
             }
         } else if (options.type === Array) {
             if (!is(val, 'Array')) {
-                error(fieldName, ': Expected Array')
+                error('Expected Array')
             }
 
             var length = val.length;
             if (is(options.min, 'Number') && length < options.min) {
-                error(fieldName, ': Expected length >= ', options.min, ' but is ', length)
+                error('Expected length >= ', options.min, ' but is ', length)
             }
             if (is(options.max, 'Number') && length > options.max) {
-                error(fieldName, ': Expected length <= ', options.max, ' but is ', length)
+                error('Expected length <= ', options.max, ' but is ', length)
             }
         } else if (options.type) {
-            error(fieldName, ': Unknown type "', options.type, '"')
+            error('Unknown type "', options.type, '"')
         }
 
         if (is(options.enum, 'Array') && options.enum.indexOf(val) === -1) {
-            error(fieldName, ': "', val, '" not in ', JSON.stringify(options.enum))
+            error('"', val, '" not in ', JSON.stringify(options.enum))
         }
-
-        _validatedFields.push(fieldName);
 
         if (is(nestedFn, 'Function') && is(val, 'Array')) {
             val.forEach(function (nestedVal, nestedIndex) {
-                var nestedHierarchy = _hierarchy.concat(fieldName).concat(nestedIndex);
+                var nestedHierarchy = _hierarchy.concat(nestedIndex);
                 var nestedValidator = new Validator(nestedVal, nestedHierarchy);
                 nestedFn(nestedValidator, nestedVal)
             })
         } else if (is(nestedFn, 'Function') && is(val, 'Object')) {
-            var nestedHierarchy = _hierarchy.concat(fieldName);
-            var nestedValidator = new Validator(val, nestedHierarchy);
+            var nestedValidator = new Validator(val, _hierarchy);
             nestedFn(nestedValidator, val)
         }
 
+        _hierarchy.pop()
         return _this
     }
 
     function error(/* msg... */) {
         var args = Array.prototype.slice.call(arguments);
-        throw _hierarchy.join('/') + '/' + args.join('')
+        throw _hierarchy.join('/') + ': ' + args.join('')
     }
 
     function is(/* value, type... */) {
