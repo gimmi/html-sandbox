@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            html, body {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+            }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
+        <script type="text/javascript">
+            class HelloWorld extends HTMLElement {
+                constructor() {
+                    super();
+                    this.attachShadow({ mode: 'open' });
+                    this.render();
+                }
+                render() {
+                    const t = document.createElement('template');
+                    t.innerHTML = `<h1>Hello World!</h1>`
+                    this.shadowRoot.appendChild(t.content.cloneNode(true));
+                }
+            }
+            window.customElements.define('hello-world', HelloWorld);
+        </script>
+    </head>
+    <body>
+        <hello-world></hello-world>
+    </body>
+</html>
