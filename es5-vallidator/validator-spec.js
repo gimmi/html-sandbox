@@ -83,4 +83,22 @@ describe("Player", function() {
                 })
         })
     });
+
+    it('Should allow custom contextual error', function() {
+        var data = {
+            field1: [{
+                field2: {
+                    field3: 'value'
+                }
+            }]
+        }
+        expect(function () {
+            new Validator(data).checkField('field1', Array, function (validator) {
+                validator.checkField('field2', Object, function (validator) {
+                    validator.error('custom error');
+                })
+            })
+        }).toThrow('/field1/0/field2: custom error');
+
+    });
 });
