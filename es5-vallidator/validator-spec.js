@@ -99,6 +99,12 @@ describe("Player", function() {
                 })
             })
         }).toThrow('/field1/0/field2: custom error');
+    });
 
+    it('Should validate against regex', function() {
+        new Validator('abc').check(/^[a-z]+$/)
+        expect(function () {
+            new Validator('abc123').check(/^[a-z]+$/)
+        }).toThrow('/: does not match /^[a-z]+$/');
     });
 });

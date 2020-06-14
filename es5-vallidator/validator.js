@@ -2,7 +2,7 @@ Validator = function (value, hierarchy) {
     "use strict";
 
     var _value = value,
-        _hierarchy = hierarchy || [''],
+        _hierarchy = hierarchy || [],
         _this = Object.assign(this, {
             check: check,
             checkField: checkField,
@@ -17,6 +17,10 @@ Validator = function (value, hierarchy) {
     }
 
     function check(options, nestedFn) {
+        if (is(options, 'RegExp')) {
+            options = { req: true, type: String, regex: options }
+        }
+
         if (!is(options, 'Object')) {
             options = { req: true, type: options }
         }
@@ -47,6 +51,9 @@ Validator = function (value, hierarchy) {
             }
             if (is(options.max, 'Number') && length > options.max) {
                 error('Expected length <= ', options.max, ' but is ', length)
+            }
+            if (is(options.regex, 'RegExp') && !options.regex.test(_value)) {
+                error('does not match ' + options.regex)
             }
         } else if (options.type === Number) {
             if (!is(_value, 'Number')) {
@@ -114,7 +121,7 @@ Validator = function (value, hierarchy) {
 
     function error(/* msg... */) {
         var args = Array.prototype.slice.call(arguments);
-        throw _hierarchy.join('/') + ': ' + args.join('')
+        throw '/' + _hierarchy.join('/') + ': ' + args.join('')
     }
 
     function is(/* value, type... */) {
