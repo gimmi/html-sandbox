@@ -1,4 +1,4 @@
-describe("Player", function() {
+describe("Validator", function() {
     it('Should validate valid props', function() {
         var data = {
             aString: 'abc',
