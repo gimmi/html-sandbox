@@ -1,3 +1,5 @@
+/* jshint esversion: 5, asi: true, curly: true */
+/* globals Validator: true */
 Validator = function (value, hierarchy) {
     "use strict";
 
