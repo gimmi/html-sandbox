@@ -114,19 +114,23 @@ describe("Player", function() {
         }).toThrow('/: does not match /^[a-z]+$/');
     });
 
-    it('Should detext extra fields', function() {
+    it('Should detext extra keys', function() {
         var data = { f1: 1, f2: 2, f3: 3}
         
         new Validator(data)
             .checkField('f1', Number)
             .checkField('f2', Number)
             .checkField('f3', Number)
-            .checkNoMoreFields()
+            .checkNoMoreKeys()
         
         expect(function () {
             new Validator(data)
                 .checkField('f1', Number)
-                .checkNoMoreFields()
+                .checkNoMoreKeys()
         }).toThrow('/: Unexpected extra fields: ["f2","f3"]');
+
+        new Validator(123).checkNoMoreKeys()
+        new Validator(null).checkNoMoreKeys()
+        new Validator(undefined).checkNoMoreKeys()
     });
 });
