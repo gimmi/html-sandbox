@@ -3,15 +3,37 @@ Validator = function (value, hierarchy) {
 
     var _value = value,
         _hierarchy = hierarchy || [],
+        _checkedFields = [],
         _this = Object.assign(this, {
             check: check,
             checkField: checkField,
-            error: error
+            error: error,
+            checkNoMoreFields: checkNoMoreFields
         });
 
     function checkField(name, options, nestedFn) {
+        _checkedFields.push(name);
         new Validator(_value[name], _hierarchy.concat(name))
             .check(options, nestedFn);
+
+        return _this
+    }
+
+    function checkNoMoreFields() {
+        var allFields = [];
+        if (is(_value, 'Object')) {
+            allFields = Object.keys(_value)
+        } else if (is(_value, 'Array')) {
+            allFields = _value.map(function (_, index) { return index })
+        }
+
+        var extraFields = allFields.filter(function (field) {
+            return _checkedFields.indexOf(field) === -1
+        })
+
+        if (extraFields.length > 0) {
+            error('Unexpected extra fields: ' + JSON.stringify(extraFields))
+        }
 
         return _this
     }

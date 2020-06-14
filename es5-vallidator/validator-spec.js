@@ -113,4 +113,20 @@ describe("Player", function() {
             new Validator('abc123').check(/^[a-z]+$/)
         }).toThrow('/: does not match /^[a-z]+$/');
     });
+
+    it('Should detext extra fields', function() {
+        var data = { f1: 1, f2: 2, f3: 3}
+        
+        new Validator(data)
+            .checkField('f1', Number)
+            .checkField('f2', Number)
+            .checkField('f3', Number)
+            .checkNoMoreFields()
+        
+        expect(function () {
+            new Validator(data)
+                .checkField('f1', Number)
+                .checkNoMoreFields()
+        }).toThrow('/: Unexpected extra fields: ["f2","f3"]');
+    });
 });
