@@ -101,7 +101,7 @@ Validator = function (value, hierarchy) {
         }
 
         if (is(options.enum, 'Array') && options.enum.indexOf(_value) === -1) {
-            error('"', _value, '" not in ', JSON.stringify(options.enum))
+            error(JSON.stringify(_value), ' not in ', JSON.stringify(options.enum))
         }
 
         if (is(nestedFn, 'Function')) {

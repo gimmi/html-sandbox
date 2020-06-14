@@ -47,13 +47,19 @@ describe("Player", function() {
 
         expect(function () {
             new Validator({ str: 123 }).checkField('str', { enum: ['V1', 'V2'] })
-        }).toThrow('/str: "123" not in ["V1","V2"]');
+        }).toThrow('/str: 123 not in ["V1","V2"]');
 
         new Validator({ str: null }).checkField('str', { req: false, enum: ['V1', 'V2'] })
 
         expect(function () {
             new Validator({ str: 'V3' }).checkField('str', { enum: ['V1', 'V2'] })
         }).toThrow('/str: "V3" not in ["V1","V2"]');
+
+        new Validator(1).check({ enum: [1, 2, 3] })
+
+        expect(function () {
+            new Validator(4).check({ enum: [1, 2, 3] })
+        }).toThrow('/: 4 not in [1,2,3]');
     });
 
     it('Should navigate tree', function() {
