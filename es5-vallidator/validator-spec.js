@@ -8,51 +8,51 @@ describe("Player", function() {
         };
 
         new Validator(data)
-            .checkField('aString', String)
-            .checkField('aNumber', Number)
-            .checkField('aBoolean', Boolean)
-            .checkField('anArray', Array)
+            .checkKey('aString', String)
+            .checkKey('aNumber', Number)
+            .checkKey('aBoolean', Boolean)
+            .checkKey('anArray', Array)
 
         expect().nothing();
     });
 
     it('Should validate String', function() {
         expect(function () {
-            new Validator({ str: 123 }).checkField('str', String)
+            new Validator({ str: 123 }).checkKey('str', String)
         }).toThrow('/str: Expected String');
 
         expect(function () {
-            new Validator({ str: null }).checkField('str', String)
+            new Validator({ str: null }).checkKey('str', String)
         }).toThrow('/str: required but missing');
 
         expect(function () {
-            new Validator({}).checkField('str', String)
+            new Validator({}).checkKey('str', String)
         }).toThrow('/str: required but missing');
     });
 
     it('Should have sensible default for "req" option', function() {
-        new Validator({ str: 'val' }).checkField('str', String)
+        new Validator({ str: 'val' }).checkKey('str', String)
 
         expect(function () {
-            new Validator({}).checkField('str', String)
+            new Validator({}).checkKey('str', String)
         }).toThrow('/str: required but missing');
 
-        new Validator({}).checkField('str', { req: false, type: String })
-        new Validator({ str: null }).checkField('str', { req: false, type: String })
-        new Validator({ str: undefined }).checkField('str', { req: false, type: String })
+        new Validator({}).checkKey('str', { req: false, type: String })
+        new Validator({ str: null }).checkKey('str', { req: false, type: String })
+        new Validator({ str: undefined }).checkKey('str', { req: false, type: String })
     });
 
     it('Should validate enum', function() {
-        new Validator({ str: 'V1' }).checkField('str', { enum: ['V1', 'V2'] })
+        new Validator({ str: 'V1' }).checkKey('str', { enum: ['V1', 'V2'] })
 
         expect(function () {
-            new Validator({ str: 123 }).checkField('str', { enum: ['V1', 'V2'] })
+            new Validator({ str: 123 }).checkKey('str', { enum: ['V1', 'V2'] })
         }).toThrow('/str: 123 not in ["V1","V2"]');
 
-        new Validator({ str: null }).checkField('str', { req: false, enum: ['V1', 'V2'] })
+        new Validator({ str: null }).checkKey('str', { req: false, enum: ['V1', 'V2'] })
 
         expect(function () {
-            new Validator({ str: 'V3' }).checkField('str', { enum: ['V1', 'V2'] })
+            new Validator({ str: 'V3' }).checkKey('str', { enum: ['V1', 'V2'] })
         }).toThrow('/str: "V3" not in ["V1","V2"]');
 
         new Validator(1).check({ enum: [1, 2, 3] })
@@ -74,16 +74,16 @@ describe("Player", function() {
         }
         new Validator(tree).check(Object, function (validator, value) {
             expect(value.id).toBe('/');
-            validator.checkField('id', String)
-                .checkField('ary', Array, function (validator, value) {
+            validator.checkKey('id', String)
+                .checkKey('ary', Array, function (validator, value) {
                     expect(value.id).toBe('ary1');
                     validator.check(Object)
-                    validator.checkField('id', String)
-                        .checkField('obj', Object, function (validator, value) {
+                    validator.checkKey('id', String)
+                        .checkKey('obj', Object, function (validator, value) {
                             expect(value.id).toBe('obj');
-                            validator.checkField('id', String)
+                            validator.checkKey('id', String)
                             expect(function () {
-                                validator.checkField('name', String)
+                                validator.checkKey('name', String)
                             }).toThrow('/ary/0/obj/name: required but missing')
                         })
                 })
@@ -99,8 +99,8 @@ describe("Player", function() {
             }]
         }
         expect(function () {
-            new Validator(data).checkField('field1', Array, function (validator) {
-                validator.checkField('field2', Object, function (validator) {
+            new Validator(data).checkKey('field1', Array, function (validator) {
+                validator.checkKey('field2', Object, function (validator) {
                     validator.error('custom error');
                 })
             })
@@ -118,16 +118,16 @@ describe("Player", function() {
         var data = { f1: 1, f2: 2, f3: 3}
         
         new Validator(data)
-            .checkField('f1', Number)
-            .checkField('f2', Number)
-            .checkField('f3', Number)
+            .checkKey('f1', Number)
+            .checkKey('f2', Number)
+            .checkKey('f3', Number)
             .checkNoMoreKeys()
         
         expect(function () {
             new Validator(data)
-                .checkField('f1', Number)
+                .checkKey('f1', Number)
                 .checkNoMoreKeys()
-        }).toThrow('/: Unexpected extra fields: ["f2","f3"]');
+        }).toThrow('/: Unexpected extra keys: ["f2","f3"]');
 
         new Validator(123).checkNoMoreKeys()
         new Validator(null).checkNoMoreKeys()

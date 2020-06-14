@@ -6,12 +6,12 @@ Validator = function (value, hierarchy) {
         _checkedKeys = [],
         _this = Object.assign(this, {
             check: check,
-            checkField: checkField,
+            checkKey: checkKey,
             error: error,
             checkNoMoreKeys: checkNoMoreKeys
         });
 
-    function checkField(name, options, nestedFn) {
+    function checkKey(name, options, nestedFn) {
         _checkedKeys.push(name);
         new Validator(_value[name], _hierarchy.concat(name))
             .check(options, nestedFn);
