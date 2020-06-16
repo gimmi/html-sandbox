@@ -62,6 +62,14 @@ describe("Validator", function() {
         }).toThrow('/: 4 not in [1,2,3]');
     });
 
+    it('Should validate enum when passing array', function() {
+        new Validator('V1').check(['V1', 'V2'])
+
+        expect(function () {
+            new Validator(123).check(['V1', 'V2'])
+        }).toThrow('/: 123 not in ["V1","V2"]');
+    });
+
     it('Should navigate tree', function() {
         var tree = {
             id: '/',

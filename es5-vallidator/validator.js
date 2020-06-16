@@ -57,6 +57,10 @@ Validator = function (value, hierarchy) {
             options = { req: true, type: String, regex: options }
         }
 
+        if (is(options, 'Array')) {
+            options = { req: true, enum: options }
+        }
+
         if (!is(options, 'Object')) {
             options = { req: true, type: options }
         }
