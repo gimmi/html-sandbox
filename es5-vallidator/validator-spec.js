@@ -1,4 +1,9 @@
+/* jshint esversion: 5, asi: true, curly: true */
+/* globals Validator, describe, it, expect */
+
 describe("Validator", function() {
+    "use strict";
+
     it('Should validate valid props', function() {
         var data = {
             aString: 'abc',
