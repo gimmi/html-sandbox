@@ -127,20 +127,36 @@ describe("Validator", function() {
         }).toThrow('/: does not match /^[a-z]+$/');
     });
 
-    it('Should detext extra keys', function() {
+    it('Should detect extra keys', function() {
         var data = { f1: 1, f2: 2, f3: 3}
-        
+
         new Validator(data)
             .checkKey('f1', Number)
             .checkKey('f2', Number)
             .checkKey('f3', Number)
             .checkNoMoreKeys()
-        
+
         expect(function () {
             new Validator(data)
                 .checkKey('f1', Number)
                 .checkNoMoreKeys()
         }).toThrow('/: Unexpected extra keys: ["f2","f3"]');
+
+        data = {
+            f1: 1,
+            fn1: function () {},
+            fn2: function () {}
+        }
+
+        expect(function () {
+            new Validator(data)
+                .checkKey('f1', Number)
+                .checkNoMoreKeys()
+        }).toThrow('/: Unexpected extra keys: ["fn1","fn2"]');
+
+        new Validator(data)
+            .checkKey('f1', Number)
+            .checkNoMoreKeys({ skipFn: true })
 
         new Validator(123).checkNoMoreKeys()
         new Validator(null).checkNoMoreKeys()

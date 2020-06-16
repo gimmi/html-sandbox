@@ -26,12 +26,18 @@ Validator = function (value, hierarchy) {
         return _this
     }
 
-    function checkNoMoreKeys() {
+    function checkNoMoreKeys(options) {
+        options = options || {};
+
         var allKeys = [];
         if (is(_value, 'Object')) {
             allKeys = Object.keys(_value)
         } else if (is(_value, 'Array')) {
             allKeys = _value.map(function (_, index) { return index })
+        }
+
+        if (options.skipFn) {
+            allKeys = allKeys.filter(function (key) { return !is(_value[key], 'Function')  })
         }
 
         var extraKeys = allKeys.filter(function (key) {
