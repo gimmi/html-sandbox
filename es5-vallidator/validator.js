@@ -4,17 +4,17 @@ Validator = function (value, hierarchy) {
     /* globals Validator */
     "use strict";
 
-    var _value = value,
+    var _this = this,
+        _value = value,
         _hierarchy = hierarchy || [],
         _checkedKeys = [],
-        _uniqueValues = {},
-        _this = Object.assign(this, {
-            check: check,
-            checkKey: checkKey,
-            error: error,
-            checkNoMoreKeys: checkNoMoreKeys,
-            checkUnique: checkUnique
-        });
+        _uniqueValues = {};
+
+        _this.check = check;
+        _this.checkKey = checkKey;
+        _this.error = error;
+        _this.checkNoMoreKeys = checkNoMoreKeys;
+        _this.checkUnique = checkUnique;
 
     function checkKey(name, options, nestedFn) {
         _checkedKeys.push(name);
