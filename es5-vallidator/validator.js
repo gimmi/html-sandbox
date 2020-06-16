@@ -113,10 +113,6 @@ Validator = function (value, hierarchy) {
             if (!is(_value, 'Object')) {
                 error('Expected Object')
             }
-
-            if (is(options.size, 'Number') && Object.keys(_value).length !== options.size) {
-                error('Expected size ', options.size, ' but size is ', _value.length)
-            }
             var keysLength = Object.keys(_value).length;
             if (is(options.min, 'Number') && keysLength < options.min) {
                 error('Expected length >= ', options.min, ' but is ', keysLength)
