@@ -100,9 +100,6 @@ Validator = function (value, hierarchy) {
             if (is(options.max, 'Number') && length > options.max) {
                 error('Expected length <= ', options.max, ' but is ', length)
             }
-            if (is(options.regex, 'RegExp') && !options.regex.test(_value)) {
-                error('does not match ' + options.regex)
-            }
         } else if (options.type === Number) {
             if (!is(_value, 'Number')) {
                 error('Expected Number')
@@ -146,6 +143,10 @@ Validator = function (value, hierarchy) {
 
         if (is(options.enum, 'Array') && options.enum.indexOf(_value) === -1) {
             error(JSON.stringify(_value), ' not in ', JSON.stringify(options.enum))
+        }
+
+        if (is(options.regex, 'RegExp') && !options.regex.test(_value)) {
+            error('does not match ' + options.regex)
         }
 
         if (is(nestedFn, 'Function')) {

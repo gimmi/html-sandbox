@@ -122,9 +122,20 @@ describe("Validator", function() {
 
     it('Should validate against regex', function() {
         new Validator('abc').check(/^[a-z]+$/)
+
         expect(function () {
             new Validator('abc123').check(/^[a-z]+$/)
         }).toThrow('/: does not match /^[a-z]+$/');
+
+        expect(function () {
+            new Validator(123).check({ regex: /^[a-z]+$/ })
+        }).toThrow('/: does not match /^[a-z]+$/');
+
+        expect(function () {
+            new Validator('abc123').check({ regex: /^[a-z]+$/ })
+        }).toThrow('/: does not match /^[a-z]+$/');
+
+        new Validator(null).check({ req: false, regex: /^[a-z]+$/ })
     });
 
     it('Should detect extra keys', function() {
