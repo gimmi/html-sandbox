@@ -9,14 +9,12 @@ Validator = function (value, hierarchy) {
     var _this = this,
         _value = value,
         _hierarchy = hierarchy || [],
-        _checkedKeys = [],
-        _uniqueValues = {};
+        _checkedKeys = [];
 
         _this.check = check;
         _this.checkKey = checkKey;
         _this.error = error;
         _this.checkNoMoreKeys = checkNoMoreKeys;
-        _this.checkUnique = checkUnique;
 
     function checkKey(name, options, nestedFn) {
         _checkedKeys.push(name);
@@ -47,15 +45,6 @@ Validator = function (value, hierarchy) {
         if (extraKeys.length > 0) {
             error('Unexpected extra keys: ' + JSON.stringify(extraKeys))
         }
-
-        return _this
-    }
-
-    function checkUnique(value) {
-        if (_uniqueValues[value]) {
-            error('duplicate value detected: ' + JSON.stringify(value))
-        }
-        _uniqueValues[value] = true;
 
         return _this
     }

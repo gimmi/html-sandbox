@@ -173,14 +173,4 @@ describe("Validator", function() {
         new Validator(null).checkNoMoreKeys()
         new Validator(undefined).checkNoMoreKeys()
     });
-
-    it('Should detect non unique values', function() {
-        expect(function () {
-            new Validator(123)
-                .checkUnique(1)
-                .checkUnique(2)
-                .checkUnique(3)
-                .checkUnique(1)
-        }).toThrow('/: duplicate value detected: 1');
-    });
 });
