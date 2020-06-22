@@ -1,7 +1,6 @@
 // MIT Licensed, full details here: https://gimmi.mit-license.org
 
-/* jshint esversion: 5, asi: true, curly: true */
-/* globals Validator: true */
+/* global Validator:writable */
 
 Validator = function (value, hierarchy) {
     "use strict";
