@@ -138,39 +138,63 @@ describe("Validator", function() {
         new Validator(null).check({ req: false, regex: /^[a-z]+$/ })
     });
 
-    it('Should detect extra keys', function() {
-        var data = { f1: 1, f2: 2, f3: 3}
-
-        new Validator(data)
+    it('Should keep track of unchecked object keys', function() {
+        new Validator({ f1: 1, f2: 2, f3: 3})
             .checkKey('f1', Number)
             .checkKey('f2', Number)
             .checkKey('f3', Number)
             .checkNoMoreKeys()
 
         expect(function () {
-            new Validator(data)
+            new Validator({ f1: 1, f2: 2, f3: 3})
                 .checkKey('f1', Number)
                 .checkNoMoreKeys()
         }).toThrow('/: Unexpected extra keys: ["f2","f3"]');
 
-        data = {
-            f1: 1,
-            fn1: function () {},
-            fn2: function () {}
-        }
-
         expect(function () {
-            new Validator(data)
+            new Validator({ f1: 1, fn1: function () {}, fn2: function () {} })
                 .checkKey('f1', Number)
                 .checkNoMoreKeys()
         }).toThrow('/: Unexpected extra keys: ["fn1","fn2"]');
 
-        new Validator(data)
+        new Validator({ f1: 1, fn1: function () {}, fn2: function () {} })
             .checkKey('f1', Number)
             .checkNoMoreKeys({ skipFn: true })
 
         new Validator(123).checkNoMoreKeys()
         new Validator(null).checkNoMoreKeys()
         new Validator(undefined).checkNoMoreKeys()
+    });
+
+    it('Should keep track of unchecked array elements', function() {
+        var actual;
+
+        actual = new Validator(['first', 'second', 'third'])
+            .checkKey(0, String)
+            .getUnckeckedKeys()
+        expect(actual).toEqual([1, 2])
+
+        actual = new Validator(['first', 'second', 'third'])
+            .checkKey(0, String)
+            .checkKey(2, String)
+            .getUnckeckedKeys()
+        expect(actual).toEqual([1])
+
+        actual = new Validator(['first', function() {}, function() {}])
+            .checkKey(0, String)
+            .getUnckeckedKeys({ skipFn: true })
+        expect(actual).toEqual([])
+
+        expect(function () {
+            new Validator(['first', 'second', 'third'])
+                .checkKey(0, String)
+                .checkNoMoreKeys()
+        }).toThrow('/: Unexpected extra keys: [1,2]');
+
+        new Validator(['first', 'second', 'third'])
+            .checkKey(0, String)
+            .checkKey(1, String)
+            .checkKey(2, String)
+            .checkNoMoreKeys()
     });
 });

@@ -14,6 +14,7 @@ Validator = function (value, hierarchy) {
         _this.checkKey = checkKey;
         _this.error = error;
         _this.checkNoMoreKeys = checkNoMoreKeys;
+        _this.getUnckeckedKeys = getUnckeckedKeys;
 
     function checkKey(name, options, nestedFn) {
         _checkedKeys.push(name);
@@ -24,6 +25,16 @@ Validator = function (value, hierarchy) {
     }
 
     function checkNoMoreKeys(options) {
+        var uncheckedKeys = getUnckeckedKeys(options)
+
+        if (uncheckedKeys.length > 0) {
+            error('Unexpected extra keys: ' + JSON.stringify(uncheckedKeys))
+        }
+
+        return _this
+    }
+
+    function getUnckeckedKeys(options) {
         options = options || {};
 
         var allKeys = [];
@@ -37,15 +48,9 @@ Validator = function (value, hierarchy) {
             allKeys = allKeys.filter(function (key) { return !is(_value[key], 'Function')  })
         }
 
-        var extraKeys = allKeys.filter(function (key) {
+        return allKeys.filter(function (key) {
             return _checkedKeys.indexOf(key) === -1
         })
-
-        if (extraKeys.length > 0) {
-            error('Unexpected extra keys: ' + JSON.stringify(extraKeys))
-        }
-
-        return _this
     }
 
     function check(options, nestedFn) {
