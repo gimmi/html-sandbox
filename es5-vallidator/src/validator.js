@@ -48,6 +48,10 @@ Validator = function (value, hierarchy) {
             allKeys = allKeys.filter(function (key) { return !is(_value[key], 'Function')  })
         }
 
+        if (options.skip) {
+            allKeys = allKeys.filter(function (key) { return options.skip.indexOf(key) === -1 })
+        }
+
         return allKeys.filter(function (key) {
             return _checkedKeys.indexOf(key) === -1
         })

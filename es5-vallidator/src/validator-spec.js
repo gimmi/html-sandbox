@@ -145,6 +145,10 @@ describe("Validator", function() {
             .checkKey('f3', Number)
             .checkNoMoreKeys()
 
+        new Validator({ f1: 1, f2: 2, f3: 3})
+            .checkKey('f1', Number)
+            .checkNoMoreKeys({ skip: ['f3', 'f2'] })
+
         expect(function () {
             new Validator({ f1: 1, f2: 2, f3: 3})
                 .checkKey('f1', Number)
@@ -196,5 +200,9 @@ describe("Validator", function() {
             .checkKey(1, String)
             .checkKey(2, String)
             .checkNoMoreKeys()
+
+        new Validator(['first', 'second', 'third'])
+            .checkKey(1, String)
+            .checkNoMoreKeys({ skip: [0, 2] })
     });
 });
