@@ -38,14 +38,14 @@ Validator = function (value, hierarchy) {
         options = options || {};
 
         var allKeys = [];
-        if (is(_value, 'Object')) {
+        if (isObject(_value)) {
             allKeys = Object.keys(_value)
-        } else if (is(_value, 'Array')) {
+        } else if (isArray(_value)) {
             allKeys = _value.map(function (_, index) { return index })
         }
 
         if (options.skipFn) {
-            allKeys = allKeys.filter(function (key) { return !is(_value[key], 'Function')  })
+            allKeys = allKeys.filter(function (key) { return !isFunction(_value[key])  })
         }
 
         if (options.skip) {
@@ -58,23 +58,23 @@ Validator = function (value, hierarchy) {
     }
 
     function check(options, nestedFn) {
-        if (is(options, 'RegExp')) {
+        if (isRegExp(options)) {
             options = { req: true, type: String, regex: options }
         }
 
-        if (is(options, 'Array')) {
+        if (isArray(options)) {
             options = { req: true, enum: options }
         }
 
-        if (!is(options, 'Object')) {
+        if (!isObject(options)) {
             options = { req: true, type: options }
         }
 
-        if (is(options.req, 'Null', 'Undefined')) {
+        if (isNullOrUndefined(options.req)) {
             options.req = true;
         }
 
-        if (is(_value, 'Null', 'Undefined')) {
+        if (isNullOrUndefined(_value)) {
             if (options.req) {
                 error('required but missing')
             } else {
@@ -82,72 +82,72 @@ Validator = function (value, hierarchy) {
             }
         }
 
-        if (options.req && is(_value, 'Null', 'Undefined')) {
+        if (options.req && isNullOrUndefined(_value)) {
             error('required but missing')
         }
 
         if (options.type === String) {
-            if (!is(_value, 'String')) {
+            if (!isString(_value)) {
                 error('Expected String')
             }
             var length = _value.length;
-            if (is(options.min, 'Number') && length < options.min) {
+            if (isNumber(options.min) && length < options.min) {
                 error('Expected length >= ', options.min, ' but is ', length)
             }
-            if (is(options.max, 'Number') && length > options.max) {
+            if (isNumber(options.max) && length > options.max) {
                 error('Expected length <= ', options.max, ' but is ', length)
             }
         } else if (options.type === Number) {
-            if (!is(_value, 'Number')) {
+            if (!isNumber(_value)) {
                 error('Expected Number')
             }
-            if (is(options.min, 'Number') && _value < options.min) {
+            if (isNumber(options.min) && _value < options.min) {
                 error('Expected >= ', options.min, ' but is ', _value)
             }
-            if (is(options.max, 'Number') && _value > options.max) {
+            if (isNumber(options.max) && _value > options.max) {
                 error('Expected <= ', options.max, ' but is ', _value)
             }
         } else if (options.type === Boolean) {
-            if (!is(_value, 'Boolean')) {
+            if (!isBoolean(_value)) {
                 error('Expected Boolean')
             }
         } else if (options.type === Object) {
-            if (!is(_value, 'Object')) {
+            if (!isObject(_value)) {
                 error('Expected Object')
             }
             var keysLength = Object.keys(_value).length;
-            if (is(options.min, 'Number') && keysLength < options.min) {
+            if (isNumber(options.min) && keysLength < options.min) {
                 error('Expected length >= ', options.min, ' but is ', keysLength)
             }
-            if (is(options.max, 'Number') && keysLength > options.max) {
+            if (isNumber(options.max) && keysLength > options.max) {
                 error('Expected length <= ', options.max, ' but is ', keysLength)
             }
         } else if (options.type === Array) {
-            if (!is(_value, 'Array')) {
+            if (!isArray(_value)) {
                 error('Expected Array')
             }
 
             var arrayLength = _value.length;
-            if (is(options.min, 'Number') && arrayLength < options.min) {
+            if (isNumber(options.min) && arrayLength < options.min) {
                 error('Expected length >= ', options.min, ' but is ', _value.length)
             }
-            if (is(options.max, 'Number') && _value.length > options.max) {
+            if (isNumber(options.max) && _value.length > options.max) {
                 error('Expected length <= ', options.max, ' but is ', _value.length)
             }
         } else if (options.type) {
             error('Unknown type "', options.type, '"')
         }
 
-        if (is(options.enum, 'Array') && options.enum.indexOf(_value) === -1) {
+        if (isArray(options.enum) && options.enum.indexOf(_value) === -1) {
             error(JSON.stringify(_value), ' not in ', JSON.stringify(options.enum))
         }
 
-        if (is(options.regex, 'RegExp') && !options.regex.test(_value)) {
+        if (isRegExp(options.regex) && !options.regex.test(_value)) {
             error('does not match ' + options.regex)
         }
 
-        if (is(nestedFn, 'Function')) {
-            if (is(_value, 'Array')) {
+        if (isFunction(nestedFn)) {
+            if (isArray(_value)) {
                 _value.forEach(function (nestedVal, nestedIndex) {
                     var nestedHierarchy = _hierarchy.concat(nestedIndex);
                     var nestedValidator = new Validator(nestedVal, nestedHierarchy);
@@ -166,11 +166,36 @@ Validator = function (value, hierarchy) {
         throw '/' + _hierarchy.join('/') + ': ' + args.join('')
     }
 
-    function is(/* value, type... */) {
-        var args = Array.prototype.slice.call(arguments),
-            value = Object.prototype.toString.call(args.shift());
+    function isObject(value) {
+        return Object.prototype.toString.call(value) === '[object Object]'
+    }
 
-        return args.map(function (x) { return '[object ' + x + ']' })
-            .indexOf(value) !== -1;
+    function isArray(value) {
+        return Object.prototype.toString.call(value) === '[object Array]'
+    }
+
+    function isRegExp(value) {
+        return Object.prototype.toString.call(value) === '[object RegExp]'
+    }
+
+    function isString(value) {
+        return Object.prototype.toString.call(value) === '[object String]'
+    }
+
+    function isNumber(value) {
+        return Object.prototype.toString.call(value) === '[object Number]'
+    }
+
+    function isBoolean(value) {
+        return Object.prototype.toString.call(value) === '[object Boolean]'
+    }
+
+    function isFunction(value) {
+        return Object.prototype.toString.call(value) === '[object Function]'
+    }
+
+    function isNullOrUndefined(value) {
+        var toString = Object.prototype.toString.call(value)
+        return toString === '[object Null]' || toString === '[object Undefined]'
     }
 };
