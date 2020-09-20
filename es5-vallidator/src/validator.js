@@ -1,8 +1,6 @@
 // MIT Licensed, full details here: https://gimmi.mit-license.org
 
-/* global Validator:writable */
-
-Validator = function (value, hierarchy) {
+var Validator = function (value, hierarchy) {
     "use strict";
 
     var _this = this,
@@ -199,3 +197,9 @@ Validator = function (value, hierarchy) {
         return toString === '[object Null]' || toString === '[object Undefined]'
     }
 };
+
+/* global module */
+if (typeof module === 'object' && module.exports) {
+    // See https://github.com/umdjs/umd/blob/master/templates/returnExportsGlobal.js
+    module.exports = Validator
+}
