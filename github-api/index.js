@@ -24,8 +24,14 @@ loadEl.addEventListener('click', async () => {
     const { data: tree } = await octokit.git.getTree({
         owner: repo.owner.login,
         repo: repo.name,
-        tree_sha: ref.object.sha,
+        tree_sha: ref.object.sha
     });
 
-    outputEl.textContent = JSON.stringify(tree, null, 2)
+    for (let it of tree.tree) {
+        outputEl.textContent += it.path
+        if (it.type === 'tree') {
+            outputEl.textContent += '/'
+        }
+        outputEl.textContent += '\n'
+    }
 })
