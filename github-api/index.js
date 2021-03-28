@@ -12,7 +12,10 @@ loadEl.addEventListener('click', async () => {
 
     localStorage.setItem('auth', auth)
 
-    const { data: repo } = await octokit.request('/repos/gimmi/brain')
+    const { data: repo } = await octokit.repos.get({
+        owner: 'gimmi',
+        repo: 'brain'
+    })
 
     // Inspired by https://gist.github.com/testcollab/1236348
     const { data: ref } = await octokit.git.getRef({
