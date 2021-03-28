@@ -2,7 +2,8 @@ import { Octokit } from 'https://cdn.skypack.dev/@octokit/rest'
 
 const loadEl = document.getElementById('load')
 const authEl = document.getElementById('auth')
-const outputEl = document.getElementById('output')
+const listEl = document.getElementById('list')
+const contentEl = document.getElementById('content')
 
 authEl.value = localStorage.getItem('auth')
 
@@ -31,10 +32,18 @@ loadEl.addEventListener('click', async () => {
     });
 
     for (let it of tree.tree) {
-        outputEl.textContent += it.path
-        if (it.type === 'tree') {
-            outputEl.textContent += '/'
+        listEl.textContent += `${it.path}${it.type === 'tree' ? '/' : ''} [${it.sha}]\n`
+
+        if (it.path === 'Docker.md') {
+            const { data: blob } = await octokit.rest.git.getBlob({
+                owner: repo.owner.login,
+                repo: repo.name,
+                file_sha: it.sha
+            })
+
+            const content = blob.encoding === 'base64' ? window.atob(blob.content) : blob.content;
+            contentEl.textContent = content;
         }
-        outputEl.textContent += '\n'
     }
+
 })
