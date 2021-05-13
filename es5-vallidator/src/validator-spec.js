@@ -35,16 +35,22 @@ describe("Validator", function() {
         }).toThrow('/str: required but missing');
     });
 
+    it('Should support optional values', function() {
+        var nestedFnCalled = false;
+
+        new Validator({}).checkKey('str', { req: false, type: String }, function () { nestedFnCalled = true })
+        new Validator({ str: null }).checkKey('str', { req: false, type: String }, function () { nestedFnCalled = true })
+        new Validator({ str: undefined }).checkKey('str', { req: false, type: String }, function () { nestedFnCalled = true })
+
+        expect(nestedFnCalled).toBe(false)
+    });
+
     it('Should have sensible default for "req" option', function() {
         new Validator({ str: 'val' }).checkKey('str', String)
 
         expect(function () {
             new Validator({}).checkKey('str', String)
         }).toThrow('/str: required but missing');
-
-        new Validator({}).checkKey('str', { req: false, type: String })
-        new Validator({ str: null }).checkKey('str', { req: false, type: String })
-        new Validator({ str: undefined }).checkKey('str', { req: false, type: String })
     });
 
     it('Should validate enum', function() {

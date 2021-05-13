@@ -82,10 +82,6 @@ Validator = function (value, hierarchy) {
             }
         }
 
-        if (options.req && Validator.isNullOrUndefined(_value)) {
-            error('required but missing')
-        }
-
         if (options.type === String) {
             if (!Validator.isString(_value)) {
                 error('Expected String')
