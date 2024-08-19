@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sample Preact</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "preact": "https://esm.sh/preact@10",
+        "preact/": "https://esm.sh/preact@10/"
+      }
+    }
+  </script>
+  <script type="module">
+    import { h, render } from 'preact';
+    import { useState } from 'preact/hooks';
+
+    render(h(App), document.body);
+
+    function App() {
+      const [count, setCount] = useState(0);
+      const handleClick = () => setCount(count + 1)
+
+      return [
+        h('h1', null, `Count is ${count}`),
+        h('button', { onClick: handleClick }, 'INC')
+      ]
+    }
+  </script>
+</head>
+
+<body>
+</body>
+
+</html>
