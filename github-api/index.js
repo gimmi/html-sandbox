@@ -1,4 +1,4 @@
-import { Octokit } from 'https://cdn.skypack.dev/@octokit/rest'
+import { Octokit } from 'https://esm.sh/octokit@4.0.2'
 
 const loadEl = document.getElementById('load')
 const authEl = document.getElementById('auth')
@@ -9,7 +9,7 @@ authEl.value = localStorage.getItem('auth')
 
 loadEl.addEventListener('click', async () => {
     const auth = authEl.value
-    const octokit = new Octokit({ auth })
+    const { rest: octokit } = new Octokit({ auth })
 
     localStorage.setItem('auth', auth)
 
@@ -35,7 +35,7 @@ loadEl.addEventListener('click', async () => {
         listEl.textContent += `${it.path}${it.type === 'tree' ? '/' : ''} [${it.sha}]\n`
 
         if (it.path === 'Docker.md') {
-            const { data: blob } = await octokit.rest.git.getBlob({
+            const { data: blob } = await octokit.git.getBlob({
                 owner: repo.owner.login,
                 repo: repo.name,
                 file_sha: it.sha
