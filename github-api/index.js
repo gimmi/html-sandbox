@@ -1,4 +1,5 @@
 import { Octokit } from 'https://esm.sh/octokit@4.0.2'
+import YAML from 'https://esm.sh/yaml@2.6.0'
 
 const loadEl = document.getElementById('load')
 const authEl = document.getElementById('auth')
@@ -17,6 +18,16 @@ loadEl.addEventListener('click', async () => {
         owner: 'gimmi',
         repo: 'brain'
     })
+
+    const { data: file } = await octokit.repos.getContent({
+        owner: repo.owner.login,
+        repo: repo.name,
+        path: '/Bookmarks.yaml'
+    })
+    
+    const content = YAML.parse(atob(file.content))
+
+    console.dir(content)
 
     // Inspired by https://gist.github.com/testcollab/1236348
     const { data: ref } = await octokit.git.getRef({
