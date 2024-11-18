@@ -20,7 +20,7 @@
     "jasmine-core": "^2.6.1"
   },
   "dependencies": {
-    "bootstrap": "3.3.7",
+    "bootstrap": "5.0.0",
     "font-awesome": "4.7.0",
 
     "core-js": "2.4.1",
