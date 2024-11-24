@@ -17,6 +17,8 @@ function App() {
   const [auth, setAuth] = useState(localStorage.getItem('auth'));
   const [searchText, setSearchText] = useState("");
   const [links, setLinks] = useState([]);
+
+  // TODO replace with https://github.com/farzher/fuzzysort
   const searchRegEx = new RegExp(searchText, "i")
   
   useEffect(async () => {
