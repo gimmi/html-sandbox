@@ -15,28 +15,43 @@ render(h(App), document.getElementById('app'));
 
 function App() {
   const [auth, setAuth] = useState(localStorage.getItem('auth'));
-  const [content, setContent] = useState({});
-
+  const [searchText, setSearchText] = useState("");
+  const [links, setLinks] = useState([]);
+  const searchRegEx = new RegExp(searchText, "i")
+  
   useEffect(async () => {
+    // TODO check missing auth
     const cont = await getContent(auth)
-    setContent(cont)
+    // TODO adjust / validate
+    setLinks(cont)
   }, [auth])
 
-  const links = _.chain(content)
-    .map(link => {
-      return h("li", {}, 
-        h(Link, { link })
-      )
-    })
-    .value()
+  
 
+  const filteredLinks = filterLinks(links);
   return [
     h("fieldset", { role: "search" },
-      h("input", { type: "search", placeholder: "Search" }),
-      h("button", { type: "button" }, "Search")
+      h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value) })
     ),
-    h("ul", {}, links)
+    h("ul", {}, filteredLinks.map(link => h("li", {},
+      h(Link, { link })
+    )))
   ]
+
+  function filterLinks(inLinks) {
+    return inLinks.reduce((outLinks, inLink) => {
+      const outLink = {
+        ...inLink,
+        links: filterLinks(inLink.links || [])
+      }
+
+      if (outLink.links.length || searchRegEx.test(outLink.title)) {
+        outLinks.push(outLink)
+      }
+
+      return outLinks
+    }, [])
+  }
 }
 
 function Link({ link }) {
@@ -44,19 +59,13 @@ function Link({ link }) {
     h("a", { href: link.href }, link.title) :
     h("span", {}, link.title)
 
-  const subLinkEls = _.map(link.links, subLink => {
-    return h("li", {},
-      h(Link, { link: subLink })
-    )
-  })
-
-  if (_.isEmpty(subLinkEls)) {
-    return linkEl
-  }
+  const subLinkEls = _.map(link.links, subLink => h("li", {},
+    h(Link, { link: subLink })
+  ))
 
   return [
     linkEl,
-    h("ul", {}, subLinkEls)
+    _.isEmpty(subLinkEls) ? null : h("ul", {}, subLinkEls)
   ]
 }
 
