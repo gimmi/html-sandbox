@@ -2,7 +2,7 @@ import { Octokit } from 'https://esm.sh/octokit@4.0.2'
 import YAML from 'https://esm.sh/yaml@2.6.0'
 
 import { h, render } from 'https://esm.sh/preact@10';
-import { useState, useEffect } from 'https://esm.sh/preact@10/hooks';
+import { useState, useEffect, useRef } from 'https://esm.sh/preact@10/hooks';
 import _ from 'https://esm.sh/lodash@4.17.21';
 
 const appEl = document.getElementById('app')
@@ -17,10 +17,11 @@ function App() {
   const [auth, setAuth] = useState(localStorage.getItem('auth'));
   const [searchText, setSearchText] = useState("");
   const [links, setLinks] = useState([]);
+  const dialogRef = useRef(null);
 
   // TODO replace with https://github.com/farzher/fuzzysort
   const searchRegEx = new RegExp(searchText, "i")
-  
+
   useEffect(async () => {
     // TODO check missing auth
     const cont = await getContent(auth)
@@ -28,17 +29,33 @@ function App() {
     setLinks(cont)
   }, [auth])
 
-  
+  const filteredLinks = filterLinks(links).map(link => h("li", {},
+    h(Link, { link })
+  ))
 
-  const filteredLinks = filterLinks(links);
   return [
     h("fieldset", { role: "search" },
-      h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value) })
+      h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value) }),
+      h("input", { type: "button", value: "⚙", onClick: onOpenSettings })
     ),
-    h("ul", {}, filteredLinks.map(link => h("li", {},
-      h(Link, { link })
-    )))
+    h("ul", {}, filteredLinks),
+    h('dialog', { ref: dialogRef, open: false },
+      h('article', {},
+        h('header', {},
+          h('button', { rel: 'prev' }),
+          h('p', {}, h('strong', {}, 'Settings'))
+        ),
+        h('p', {}, 'TODO')
+      )
+    )
   ]
+
+  function onOpenSettings() {
+    const dialogEl = dialogRef.current;
+    if (!dialogEl) return;
+
+    dialogEl.showModal();
+  }
 
   function filterLinks(inLinks) {
     return inLinks.reduce((outLinks, inLink) => {
