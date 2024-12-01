@@ -17,7 +17,7 @@ function App() {
   const [auth, setAuth] = useState(localStorage.getItem('auth'));
   const [searchText, setSearchText] = useState("");
   const [links, setLinks] = useState([]);
-  const dialogRef = useRef(null);
+  const [open, setOpen] = useState(false);
 
   // TODO replace with https://github.com/farzher/fuzzysort
   const searchRegEx = new RegExp(searchText, "i")
@@ -36,18 +36,10 @@ function App() {
   return [
     h("fieldset", { role: "search" },
       h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value) }),
-      h("input", { type: "button", value: "⚙", onClick: onOpenSettings })
+      h("input", { type: "button", value: "⚙", onClick: e => setOpen(true) })
     ),
     h("ul", {}, filteredLinks),
-    h('dialog', { ref: dialogRef, open: false },
-      h('article', {},
-        h('header', {},
-          h('button', { rel: 'prev' }),
-          h('p', {}, h('strong', {}, 'Settings'))
-        ),
-        h('p', {}, 'TODO')
-      )
-    )
+    h(SettingsDialog, { open, onClose: e => setOpen(false) })
   ]
 
   function onOpenSettings() {
@@ -71,6 +63,34 @@ function App() {
       return outLinks
     }, [])
   }
+}
+
+function SettingsDialog({ open, onClose }) {
+  return h('dialog', { open },
+    h('article', {},
+      h('header', {},
+        h('button', { rel: 'prev', onClick: onClose }),
+        h('p', {}, h('strong', {}, 'Settings'))
+      ),
+      h('form', {},
+        h('fieldset', { class: 'grid' },
+          h('label', {}, 
+            'Owner',
+            h('input', { value: 'xxx' })
+          ),
+          h('label', {},
+            'Repo',
+            h('input')
+          )
+        ),
+        h('label', {},
+          'Auth',
+          h('input')
+        ),
+        h('input', { type: 'button', value: 'Update' })
+      )
+    )
+  )
 }
 
 function Link({ link }) {
