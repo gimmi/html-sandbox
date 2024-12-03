@@ -66,31 +66,43 @@ function App() {
 }
 
 function SettingsDialog({ open, onClose }) {
+  const owner =  localStorage.getItem('owner')
+  const repo =  localStorage.getItem('repo')
+  const auth =  localStorage.getItem('auth')
+
   return h('dialog', { open },
     h('article', {},
       h('header', {},
-        h('button', { rel: 'prev', onClick: onClose }),
+        h('button', { rel: 'prev', onClick: onCancel }),
         h('p', {}, h('strong', {}, 'Settings'))
       ),
       h('form', {},
         h('fieldset', { class: 'grid' },
-          h('label', {}, 
+          h('label', {},
             'Owner',
-            h('input', { value: 'xxx' })
+            h('input', { value: owner, onInput: e => owner = e.currentTarget.value })
           ),
           h('label', {},
             'Repo',
-            h('input')
+            h('input', { value: repo, onInput: e => repo = e.currentTarget.value })
           )
         ),
         h('label', {},
           'Auth',
-          h('input')
+          h('input', { value: auth, onInput: e => auth = e.currentTarget.value })
         ),
-        h('input', { type: 'button', value: 'Update' })
+        h('input', { type: 'button', value: 'Update', onClick: onUpdate })
       )
     )
   )
+
+  function onCancel() {
+    onClose(settings)
+  }
+
+  function onUpdate() {
+    onClose(settings)
+  }
 }
 
 function Link({ link }) {
