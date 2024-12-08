@@ -1,34 +1,22 @@
 import { h } from 'preact';
-import { useState, useEffect, useRef } from 'preact/hooks';
+import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import _ from 'lodash';
 import SettingsDialog from "./settings-dialog.js"
 import Link from "./link.js"
 
 export default function App() {
     const [searchText, setSearchText] = useState("");
-    const [links, setLinks] = useState([]);
+    const [links, setLinks] = useLinks();
     const dialogRef = useRef(null);
 
     // TODO replace with https://github.com/farzher/fuzzysort
     const searchRegEx = new RegExp(searchText, "i")
 
-    useEffect(async () => {
-        let content = null
-        while (true) {
-            content = JSON.parse(localStorage.getItem('content') || "null")
-            if (content) {
-                break
-            }
-
-            content = await openDialog()
-            if (content) {
-                localStorage.setItem('content', JSON.stringify(content))
-                break
-            }
-        }
-
-        setLinks(content)
-    }, [])
+    // useEffect(async () => {
+    //     while (links.length === 0) {
+    //         setLinks(await dialogRef.current.openDialog())
+    //     }
+    // }, [])
 
     const filteredLinks = filterLinks(links).map(link => h("li", {},
         h(Link, { link })
@@ -43,8 +31,11 @@ export default function App() {
         h(SettingsDialog, { ref: dialogRef })
     ]
 
-    function onOpenSettings() {
-        dialogRef.current.openDialog()
+    async function onOpenSettings() {
+        const updatedLinks = await dialogRef.current.openDialog()
+        if (updatedLinks.length > 0) {
+            setLinks(updatedLinks)
+        }
     }
 
     function filterLinks(inLinks) {
@@ -61,4 +52,18 @@ export default function App() {
             return outLinks
         }, [])
     }
+}
+
+function useLinks() {
+    const [links, setLinks] = useState(() => {
+        const cachedLinksJson = localStorage.getItem('links') || "[]"
+        return JSON.parse(cachedLinksJson)
+    })
+
+    const setAndCache = useCallback(updatedLinks => {
+        localStorage.setItem('links', JSON.stringify(updatedLinks))
+        setLinks(updatedLinks)
+    }, [links]);
+
+    return [links, setAndCache];
 }

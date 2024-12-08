@@ -58,7 +58,7 @@ export default function SettingsDialog() {
     }
 
     function onCancel() {
-        promiseCallbacks.resolve(null)
+        promiseCallbacks.resolve([])
         setPromiseCallbacks(null)
     }
 
@@ -66,12 +66,12 @@ export default function SettingsDialog() {
         try {
             const { rest: octokit } = new Octokit({ auth })
             const { data: file } = await octokit.repos.getContent({ owner, repo, path })
-            const content = YAML.parse(atob(file.content))
+            const links = YAML.parse(atob(file.content))
             localStorage.setItem('owner', owner)
             localStorage.setItem('repo', repo)
             localStorage.setItem('auth', auth)
             localStorage.setItem('path', path)
-            promiseCallbacks.resolve(content)
+            promiseCallbacks.resolve(links)
             setPromiseCallbacks(null)
         } catch (error) {
             // TODO set message in UI
