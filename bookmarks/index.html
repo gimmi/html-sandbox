@@ -5,7 +5,18 @@
   <meta charset="utf-8">
   <title>GitHub API sample</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-  <script type="module" src="index.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "preact": "https://esm.sh/preact@10",
+        "preact/": "https://esm.sh/preact@10/",
+        "lodash": "https://esm.sh/lodash@4.17.21",
+        "octokit": "https://esm.sh/octokit@4.0.2",
+        "yaml": "https://esm.sh/yaml@2.6.0"
+      }
+    }
+</script>
+<script type="module" src="index.js"></script>
 </head>
 
 <body>
