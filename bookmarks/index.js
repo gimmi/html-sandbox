@@ -5,29 +5,21 @@ import { h, render } from 'https://esm.sh/preact@10';
 import { useState, useEffect, useRef } from 'https://esm.sh/preact@10/hooks';
 import _ from 'https://esm.sh/lodash@4.17.21';
 
-const appEl = document.getElementById('app')
-const loadEl = document.getElementById('load')
-const authEl = document.getElementById('auth')
-const listEl = document.getElementById('list')
-const contentEl = document.getElementById('content')
-
 render(h(App), document.getElementById('app'));
 
 function App() {
-  const [auth, setAuth] = useState(localStorage.getItem('auth'));
   const [searchText, setSearchText] = useState("");
   const [links, setLinks] = useState([]);
-  const [open, setOpen] = useState(false);
+  const dialogRef = useRef(null);
 
   // TODO replace with https://github.com/farzher/fuzzysort
   const searchRegEx = new RegExp(searchText, "i")
 
   useEffect(async () => {
-    // TODO check missing auth
-    const cont = await getContent(auth)
+    dialogRef.current.loadContent()
     // TODO adjust / validate
     setLinks(cont)
-  }, [auth])
+  })
 
   const filteredLinks = filterLinks(links).map(link => h("li", {},
     h(Link, { link })
@@ -36,10 +28,10 @@ function App() {
   return [
     h("fieldset", { role: "search" },
       h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value) }),
-      h("input", { type: "button", value: "⚙", onClick: e => setOpen(true) })
+      h("input", { type: "button", value: "⚙", onClick: onOpenSettings })
     ),
     h("ul", {}, filteredLinks),
-    h(SettingsDialog, { open, onClose: e => setOpen(false) })
+    h(SettingsDialog, { ref: dialogRef })
   ]
 
   function onOpenSettings() {
@@ -65,12 +57,17 @@ function App() {
   }
 }
 
-function SettingsDialog({ open, onClose }) {
-  const owner =  localStorage.getItem('owner')
-  const repo =  localStorage.getItem('repo')
-  const auth =  localStorage.getItem('auth')
+function SettingsDialog() {
+  const [openFn, setOpenFn] = useState(_.noop);
+  const [owner, setOwner] = useState("");
+  const [repo, setRepo] = useState("");
+  const [auth, setAuth] = useState("");
+  const [path, setPath] = useState("");
+  const [message, setMessage] = useState("");
 
-  return h('dialog', { open },
+  Object.assign(this, { openDialog, loadContent })
+
+  return h('dialog', { open: openFn !== _.noop },
     h('article', {},
       h('header', {},
         h('button', { rel: 'prev', onClick: onCancel }),
@@ -80,28 +77,67 @@ function SettingsDialog({ open, onClose }) {
         h('fieldset', { class: 'grid' },
           h('label', {},
             'Owner',
-            h('input', { value: owner, onInput: e => owner = e.currentTarget.value })
+            h('input', { value: owner, onInput: e => setOwner(e.currentTarget.value) })
           ),
           h('label', {},
             'Repo',
-            h('input', { value: repo, onInput: e => repo = e.currentTarget.value })
+            h('input', { value: repo, onInput: e => setRepo(e.currentTarget.value) })
           )
         ),
         h('label', {},
-          'Auth',
-          h('input', { value: auth, onInput: e => auth = e.currentTarget.value })
+          'Path',
+          h('input', { value: path, onInput: e => setPath(e.currentTarget.value) })
         ),
-        h('input', { type: 'button', value: 'Update', onClick: onUpdate })
-      )
+        h('label', {},
+          'Auth',
+          h('input', { value: auth, onInput: e => setAuth(e.currentTarget.value) })
+        )
+      ),
+      h('input', { type: 'button', value: 'Update', onClick: onUpdate })
     )
   )
 
-  function onCancel() {
-    onClose(settings)
+  function openDialog() {
+    return new Promise((resolve, reject) => {
+      setOwner(localStorage.getItem('owner') || "")
+      setRepo(localStorage.getItem('repo') || "")
+      setAuth(localStorage.getItem('auth') || "")
+      setPath(localStorage.getItem('path') || "")
+      setOpenFn(resolve)
+    })
   }
 
-  function onUpdate() {
-    onClose(settings)
+  async function loadContent() {
+    const content = localStorage.getItem('content')
+    if (content) {
+      return content
+    }
+
+    while (!await openDialog()) {
+      // keep trying
+    }
+
+    return localStorage.getItem('content')
+  }
+
+  function onCancel() {
+    openFn(false)
+    setOpenFn(_.noop)
+  }
+
+  async function onUpdate() {
+    try {
+      const content = await getContent(auth, owner, repo, path)
+      localStorage.setItem('owner', owner)
+      localStorage.setItem('repo', repo)
+      localStorage.setItem('auth', auth)
+      localStorage.setItem('path', path)
+      openFn(true)
+      setOpenFn(_.noop)
+    } catch (error) {
+      console.log(error)
+      console.log("TODO set message in UI")
+    }
   }
 }
 
@@ -120,20 +156,9 @@ function Link({ link }) {
   ]
 }
 
-async function getContent(auth) {
+async function getContent(auth, owner, repo, path) {
   const { rest: octokit } = new Octokit({ auth })
-
-  const { data: repo } = await octokit.repos.get({
-    owner: 'gimmi',
-    repo: 'brain'
-  })
-
-  const { data: file } = await octokit.repos.getContent({
-    owner: repo.owner.login,
-    repo: repo.name,
-    path: '/Bookmarks.yaml'
-  })
-
+  const { data: file } = await octokit.repos.getContent({ owner, repo, path })
   return YAML.parse(atob(file.content))
 }
 
