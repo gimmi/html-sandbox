@@ -6,6 +6,10 @@ export default function Link({ link }) {
         h("a", { href: link.href }, link.title) :
         h("span", {}, link.title)
 
+    if (link.highlight) {
+        console.log(link.title, ": ", link.highlight)
+    }
+
     const subLinkEls = _.map(link.links, subLink => h("li", {},
         h(Link, { link: subLink })
     ))

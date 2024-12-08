@@ -10,7 +10,7 @@ export default function App() {
     const dialogRef = useRef(null);
 
     // TODO replace with https://github.com/farzher/fuzzysort
-    const searchRegEx = new RegExp(searchText, "i")
+    const searchRegEx = new RegExp(_.escapeRegExp(searchText), "i")
 
     useEffect(async () => {
         let updatedLinks = links
@@ -42,13 +42,16 @@ export default function App() {
 
     function filterLinks(inLinks) {
         return inLinks.reduce((outLinks, inLink) => {
-            const outLink = {
-                ...inLink,
-                links: filterLinks(inLink.links || [])
-            }
-
-            if (outLink.links.length || searchRegEx.test(outLink.title)) {
+            const outLink = { ...inLink }
+            const match = searchRegEx.exec(outLink.title)
+            if (match) {
+                outLink.highlight = { start: match.index, length: match[0].length }
                 outLinks.push(outLink)
+            } else {
+                outLink.links = filterLinks(inLink.links || [])
+                if (outLink.links.length) {
+                    outLinks.push(outLink)
+                }
             }
 
             return outLinks
