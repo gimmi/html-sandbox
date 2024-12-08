@@ -16,10 +16,22 @@ function App() {
   const searchRegEx = new RegExp(searchText, "i")
 
   useEffect(async () => {
-    dialogRef.current.loadContent()
-    // TODO adjust / validate
-    setLinks(cont)
-  })
+    let content = null
+    while (true) {
+      content = JSON.parse(localStorage.getItem('content') || "null")
+      if (content) {
+        break
+      }
+
+      content = await openDialog()
+      if (content) {
+        localStorage.setItem('content', JSON.stringify(content))
+        break
+      }
+    }
+
+    setLinks(content)
+  }, [])
 
   const filteredLinks = filterLinks(links).map(link => h("li", {},
     h(Link, { link })
@@ -35,10 +47,7 @@ function App() {
   ]
 
   function onOpenSettings() {
-    const dialogEl = dialogRef.current;
-    if (!dialogEl) return;
-
-    dialogEl.showModal();
+    dialogRef.current.openDialog()
   }
 
   function filterLinks(inLinks) {
@@ -58,16 +67,15 @@ function App() {
 }
 
 function SettingsDialog() {
-  const [openFn, setOpenFn] = useState(_.noop);
+  const [promiseCallbacks, setPromiseCallbacks] = useState(null);
   const [owner, setOwner] = useState("");
   const [repo, setRepo] = useState("");
   const [auth, setAuth] = useState("");
   const [path, setPath] = useState("");
-  const [message, setMessage] = useState("");
 
-  Object.assign(this, { openDialog, loadContent })
+  Object.assign(this, { openDialog })
 
-  return h('dialog', { open: openFn !== _.noop },
+  return h('dialog', { open: !!promiseCallbacks },
     h('article', {},
       h('header', {},
         h('button', { rel: 'prev', onClick: onCancel }),
@@ -90,7 +98,8 @@ function SettingsDialog() {
         ),
         h('label', {},
           'Auth',
-          h('input', { value: auth, onInput: e => setAuth(e.currentTarget.value) })
+          h('input', { value: auth, onInput: e => setAuth(e.currentTarget.value) }),
+          h('small', {}, "Generate a new token ", h('a', { href: "https://github.com/settings/tokens"}, "HERE"))
         )
       ),
       h('input', { type: 'button', value: 'Update', onClick: onUpdate })
@@ -98,45 +107,36 @@ function SettingsDialog() {
   )
 
   function openDialog() {
+    if (promiseCallbacks) throw new Error("Dialog already opened")
+
     return new Promise((resolve, reject) => {
       setOwner(localStorage.getItem('owner') || "")
       setRepo(localStorage.getItem('repo') || "")
       setAuth(localStorage.getItem('auth') || "")
       setPath(localStorage.getItem('path') || "")
-      setOpenFn(resolve)
+      setPromiseCallbacks({ resolve, reject })
     })
   }
 
-  async function loadContent() {
-    const content = localStorage.getItem('content')
-    if (content) {
-      return content
-    }
-
-    while (!await openDialog()) {
-      // keep trying
-    }
-
-    return localStorage.getItem('content')
-  }
-
   function onCancel() {
-    openFn(false)
-    setOpenFn(_.noop)
+    promiseCallbacks.resolve(null)
+    setPromiseCallbacks(null)
   }
 
   async function onUpdate() {
     try {
-      const content = await getContent(auth, owner, repo, path)
+      const { rest: octokit } = new Octokit({ auth })
+      const { data: file } = await octokit.repos.getContent({ owner, repo, path })
+      const content = YAML.parse(atob(file.content))
       localStorage.setItem('owner', owner)
       localStorage.setItem('repo', repo)
       localStorage.setItem('auth', auth)
       localStorage.setItem('path', path)
-      openFn(true)
-      setOpenFn(_.noop)
+      promiseCallbacks.resolve(content)
+      setPromiseCallbacks(null)
     } catch (error) {
+      // TODO set message in UI
       console.log(error)
-      console.log("TODO set message in UI")
     }
   }
 }
@@ -155,20 +155,3 @@ function Link({ link }) {
     _.isEmpty(subLinkEls) ? null : h("ul", {}, subLinkEls)
   ]
 }
-
-async function getContent(auth, owner, repo, path) {
-  const { rest: octokit } = new Octokit({ auth })
-  const { data: file } = await octokit.repos.getContent({ owner, repo, path })
-  return YAML.parse(atob(file.content))
-}
-
-// authEl.value = localStorage.getItem('auth')
-
-// loadEl.addEventListener('click', async () => {
-//     const auth = authEl.value
-//     localStorage.setItem('auth', auth)
-
-//     const content = await getContent(auth)
-
-//     contentEl.textContent = JSON.stringify(content, null, '\t');
-// })
