@@ -12,11 +12,13 @@ export default function App() {
     // TODO replace with https://github.com/farzher/fuzzysort
     const searchRegEx = new RegExp(searchText, "i")
 
-    // useEffect(async () => {
-    //     while (links.length === 0) {
-    //         setLinks(await dialogRef.current.openDialog())
-    //     }
-    // }, [])
+    useEffect(async () => {
+        let updatedLinks = links
+        while (updatedLinks.length === 0) {
+            updatedLinks = await dialogRef.current.openDialog()
+        }
+        setLinks(updatedLinks)
+    }, [])
 
     const filteredLinks = filterLinks(links).map(link => h("li", {},
         h(Link, { link })
