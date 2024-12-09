@@ -45,7 +45,8 @@ export default function App() {
             const outLink = { ...inLink }
             const match = searchRegEx.exec(outLink.title)
             if (match) {
-                outLink.highlight = { start: match.index, length: match[0].length }
+                outLink.hlStart = match.index
+                outLink.hlLen = match[0].length
                 outLinks.push(outLink)
             } else {
                 outLink.links = filterLinks(inLink.links || [])
