@@ -32,8 +32,9 @@ loadEl.addEventListener('click', async () => {
     });
 
     const files = await getFiles(owner, repo, refData.object.sha)
+    
     listEl.textContent = files
-        .map(x => `${x.path.join("/")} [${x.sha}]`)
+        .map(x => `${x.path.join("/")} [${x.file_sha}]`)
         .join("\n")
 
     // for (let it of treeData.tree) {
@@ -51,19 +52,29 @@ loadEl.addEventListener('click', async () => {
     //     }
     // }
 
-    async function getFiles(owner, repo, tree_sha, parentPath = []) {
+    async function getContent(owner, repo, file_sha) {
+        const { data: blob } = await octokit.git.getBlob({ owner, repo, file_sha })
+        const content = blob.encoding === 'base64' ? window.atob(blob.content) : blob.content;
+        return content
+    }
+
+    async function getFiles(owner, repo, tree_sha) {
         const files = []
+        await forEachFiles(owner, repo, tree_sha, ({ owner, repo, file_sha, path }) => {
+            files.push({ path, file_sha })
+        })
+        return files
+    }
+
+    async function forEachFiles(owner, repo, tree_sha, fn, parentPath = []) {
         const { data: treeData } = await octokit.git.getTree({ owner, repo, tree_sha });
         for (let it of treeData.tree) {
             const path = [...parentPath, it.path]
             if (it.type === 'tree') {
-                const childFiles = await getFiles(owner, repo, it.sha, path)
-                files.push(...childFiles)
+                await forEachFiles(owner, repo, it.sha, fn, path)
             } else {
-                files.push({ path, sha: it.sha })
+                await Promise.resolve(fn({ owner, repo, file_sha: it.sha, path }))
             }
         }
-
-        return files
     }
 })
