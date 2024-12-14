@@ -1,5 +1,6 @@
 import { Octokit } from 'https://esm.sh/octokit@4.0.2'
 import YAML from 'https://esm.sh/yaml@2.6.0'
+import _ from "https://esm.sh/lodash@4.17.21"
 
 const loadEl = document.getElementById('load')
 const authEl = document.getElementById('auth')
@@ -61,7 +62,9 @@ loadEl.addEventListener('click', async () => {
     async function getFiles(owner, repo, tree_sha) {
         const files = []
         await forEachFiles(owner, repo, tree_sha, ({ owner, repo, file_sha, path }) => {
-            files.push({ path, file_sha })
+            if (path.at(-1).endsWith(".md")) {
+                files.push({ path, file_sha })
+            }
         })
         return files
     }
