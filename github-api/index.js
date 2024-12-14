@@ -33,7 +33,7 @@ loadEl.addEventListener('click', async () => {
 
     const files = await getFiles(owner, repo, refData.object.sha)
     listEl.textContent = files
-        .map(x => `${x.path} [${x.sha}]`)
+        .map(x => `${x.path.join("/")} [${x.sha}]`)
         .join("\n")
 
     // for (let it of treeData.tree) {
@@ -51,15 +51,16 @@ loadEl.addEventListener('click', async () => {
     //     }
     // }
 
-    async function getFiles(owner, repo, tree_sha, prefix) {
+    async function getFiles(owner, repo, tree_sha, parentPath = []) {
         const files = []
         const { data: treeData } = await octokit.git.getTree({ owner, repo, tree_sha });
         for (let it of treeData.tree) {
+            const path = [...parentPath, it.path]
             if (it.type === 'tree') {
-                const childFiles = await getFiles(owner, repo, it.sha)
+                const childFiles = await getFiles(owner, repo, it.sha, path)
                 files.push(...childFiles)
             } else {
-                files.push({ path: `${prefix}/${it.path}`, sha: it.sha })
+                files.push({ path, sha: it.sha })
             }
         }
 
