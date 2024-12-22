@@ -1,6 +1,7 @@
 import { Octokit } from 'https://esm.sh/octokit@4.0.2'
 import YAML from 'https://esm.sh/yaml@2.6.0'
 import _ from "https://esm.sh/lodash@4.17.21"
+import { marked } from "https://esm.sh/marked@15.0.3"
 
 const loadEl = document.getElementById('load')
 const authEl = document.getElementById('auth')
@@ -33,7 +34,7 @@ loadEl.addEventListener('click', async () => {
     });
 
     const files = await getFiles(owner, repo, refData.object.sha)
-    
+
     listEl.textContent = files
         .map(x => `${x.path.join("/")} [${x.file_sha}]`)
         .join("\n")
@@ -61,12 +62,41 @@ loadEl.addEventListener('click', async () => {
 
     async function getFiles(owner, repo, tree_sha) {
         const files = []
-        await forEachFiles(owner, repo, tree_sha, ({ owner, repo, file_sha, path }) => {
+        await forEachFiles(owner, repo, tree_sha, async ({ owner, repo, file_sha, path }) => {
             if (path.at(-1).endsWith(".md")) {
                 files.push({ path, file_sha })
             }
+            if (path.at(-1) === "Docker.md") {
+                const content = await getContent(owner, repo, file_sha)
+                const tokens = marked.lexer(content)
+                // contentEl.textContent = JSON.stringify(tokens, null, "\t")
+                // contentEl.textContent += "\n----------------------------------------\n"
+
+                const context = {
+                    path,
+                    headings: [...Array(10).keys().map(_ => null)]
+                }
+                forEachMdEl(context, tokens, (context, text, href) => {
+                    contentEl.textContent += `${context.path.join('/')} - ${context.headings} - ${text} - ${href}\n`
+                })
+            }
         })
+
         return files
+    }
+
+    function forEachMdEl(context, tokens, fn) {
+        for (const token of tokens) {
+            if (token.type === "heading") {
+                context.headings = [...context.headings.slice(0, token.depth), token.text]
+            } else if (token.type === "list") {
+                forEachMdEl(context, token.items, fn)
+            } else if (token.type === "link") {
+                fn(context, token.text, token.href)
+            } else if (token.tokens) {
+                forEachMdEl(context, token.tokens, fn)
+            }    
+        }
     }
 
     async function forEachFiles(owner, repo, tree_sha, fn, parentPath = []) {
