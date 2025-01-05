@@ -1,7 +1,5 @@
 import { h, Fragment } from 'preact';
 
-import Links from "./links.js"
-
 export default function Link({ link }) {
     const title = link.hlLen ?
         [
@@ -17,7 +15,7 @@ export default function Link({ link }) {
 
     const subLinks = link?.links || []
     const subLinksEl = subLinks.length ?
-        h(Links, {}, subLinks.map(subLink => h(Link, { link: subLink }))) :
+        h("div", { style: { paddingLeft: "1em", borderLeft: "1px dashed" }}, subLinks.map(subLink => h(Link, { link: subLink }))) :
         null
 
     return h(Fragment, {}, [ linkEl, subLinksEl ])

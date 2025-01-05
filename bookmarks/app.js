@@ -3,7 +3,6 @@ import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import _ from 'lodash';
 import SettingsDialog from "./settings-dialog.js"
 import Link from "./link.js"
-import Links from "./links.js"
 
 export default function App() {
     const [searchText, setSearchText] = useState("");
@@ -28,7 +27,7 @@ export default function App() {
             h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value) }),
             h("input", { type: "button", value: "⚙", onClick: onOpenSettings })
         ),
-        h(Links, {}, filteredLinks),
+        ...filteredLinks,
         h(SettingsDialog, { ref: dialogRef })
     ]
 
