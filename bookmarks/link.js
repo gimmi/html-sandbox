@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import _ from 'lodash';
 
+import Links from "./links.js"
+
 export default function Link({ link }) {
     const title = link.hlLen ?
         [
@@ -20,6 +22,6 @@ export default function Link({ link }) {
 
     return [
         linkEl,
-        _.isEmpty(subLinkEls) ? null : h("ul", {}, subLinkEls)
+        _.isEmpty(subLinkEls) ? null : h(Links, {}, subLinkEls)
     ]
 }
