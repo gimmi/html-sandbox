@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, Fragment } from 'preact';
 
 import Links from "./links.js"
 
@@ -12,13 +12,13 @@ export default function Link({ link }) {
         link.title
 
     const linkEl = link.href ?
-        h("a", { href: link.href, class: "secondary", target: "_blank" }, title) :
-        h("span", {}, title)
+        h("a", { href: link.href, class: "secondary", style: "display: block;", target: "_blank" }, title) :
+        h("span", { style: "display: block;" }, title)
 
     const subLinks = link?.links || []
     const subLinksEl = subLinks.length ?
         h(Links, {}, subLinks.map(subLink => h(Link, { link: subLink }))) :
         null
 
-    return h("div", {}, [ linkEl, subLinksEl ])
+    return h(Fragment, {}, [ linkEl, subLinksEl ])
 }
