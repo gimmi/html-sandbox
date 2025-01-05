@@ -11,7 +11,7 @@ export default function Link({ link }) {
         link.title
 
     const linkEl = link.href ?
-        h("a", { href: link.href, target: "_blank" }, title) :
+        h("a", { href: link.href, class: "secondary", target: "_blank" }, title) :
         h("span", {}, title)
 
     const subLinkEls = _.map(link.links, subLink => h("li", {},
