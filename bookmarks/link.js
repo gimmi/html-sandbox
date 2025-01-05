@@ -1,5 +1,4 @@
 import { h } from 'preact';
-import _ from 'lodash';
 
 import Links from "./links.js"
 
@@ -16,12 +15,10 @@ export default function Link({ link }) {
         h("a", { href: link.href, class: "secondary", target: "_blank" }, title) :
         h("span", {}, title)
 
-    const subLinkEls = _.map(link.links, subLink => h("li", {},
-        h(Link, { link: subLink })
-    ))
+    const subLinks = link?.links || []
+    const subLinksEl = subLinks.length ?
+        h(Links, {}, subLinks.map(subLink => h(Link, { link: subLink }))) :
+        null
 
-    return [
-        linkEl,
-        _.isEmpty(subLinkEls) ? null : h(Links, {}, subLinkEls)
-    ]
+    return h("li", {}, [ linkEl, subLinksEl ])
 }
