@@ -20,5 +20,5 @@ export default function Link({ link }) {
         h(Links, {}, subLinks.map(subLink => h(Link, { link: subLink }))) :
         null
 
-    return h("li", {}, [ linkEl, subLinksEl ])
+    return h("li", { style: { listStyle: "none" }}, [ linkEl, subLinksEl ])
 }
