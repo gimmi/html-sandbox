@@ -33,7 +33,8 @@ export default function SettingsDialog() {
                 ),
                 h('label', {},
                     'Path',
-                    h('input', { value: path, onInput: e => setPath(e.currentTarget.value) })
+                    h('input', { value: path, onInput: e => setPath(e.currentTarget.value) }),
+                    h('small', {}, "Edit ", h('a', { href: `https://github.com/${owner}/${repo}/edit/main/${path}` }, "HERE"))
                 ),
                 h('label', {},
                     'Auth',
