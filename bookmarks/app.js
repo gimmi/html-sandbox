@@ -20,7 +20,7 @@ export default function App() {
         setLinks(updatedLinks)
     }, [])
 
-    const filteredLinks = filterLinks(links).map(link => h(Link, { link }))
+    const filteredLinks = filterLinks(links, searchRegEx).map(link => h(Link, { link }))
 
     return [
         h("fieldset", { role: "search" },
@@ -37,25 +37,26 @@ export default function App() {
             setLinks(updatedLinks)
         }
     }
+}
 
-    function filterLinks(inLinks) {
-        return inLinks.reduce((outLinks, inLink) => {
-            const outLink = { ...inLink }
-            const match = searchRegEx.exec(outLink.title)
-            if (match) {
-                outLink.hlStart = match.index
-                outLink.hlLen = match[0].length
+function filterLinks(inLinks, searchRegEx) {
+    inLinks ||= []
+    return inLinks.reduce((outLinks, inLink) => {
+        const outLink = { ...inLink }
+        const match = searchRegEx.exec(outLink.title)
+        if (match) {
+            outLink.hlStart = match.index
+            outLink.hlLen = match[0].length
+            outLinks.push(outLink)
+        } else {
+            outLink.links = filterLinks(inLink.links, searchRegEx)
+            if (outLink.links.length) {
                 outLinks.push(outLink)
-            } else {
-                outLink.links = filterLinks(inLink.links || [])
-                if (outLink.links.length) {
-                    outLinks.push(outLink)
-                }
             }
+        }
 
-            return outLinks
-        }, [])
-    }
+        return outLinks
+    }, [])
 }
 
 function useLinks() {
