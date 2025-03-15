@@ -10,7 +10,11 @@ export default function App() {
     const dialogRef = useRef(null);
 
     // TODO replace with https://github.com/farzher/fuzzysort
-    const searchRegEx = new RegExp(_.escapeRegExp(searchText), "id")
+    const rxs = searchText
+        .split(" ")
+        .filter(Boolean)
+        .map(_.escapeRegExp)
+        .map(x => new RegExp(x, "id"))
 
     useEffect(async () => {
         let updatedLinks = links
@@ -20,7 +24,9 @@ export default function App() {
         setLinks(updatedLinks)
     }, [])
 
-    const filteredLinks = filterLinks(links, searchRegEx).map(link => h(Link, { link }))
+    const filteredLinks = rxs
+        .reduce(filterLinks, links)
+        .map(link => h(Link, { link }))
 
     return [
         h("fieldset", { role: "search" },
@@ -39,22 +45,21 @@ export default function App() {
     }
 }
 
-function filterLinks(inLinks, searchRegEx) {
-    inLinks ||= []
-    return inLinks.reduce((outLinks, inLink) => {
-        const outLink = { ...inLink }
-        const match = searchRegEx.exec(outLink.title)
+function filterLinks(links, rx) {
+    return links.reduce((links, inLink) => {
+        const link = { ...inLink }
+        const match = rx.exec(link.title)
         if (match) {
-            outLink.match = match.indices[0]
-            outLinks.push(outLink)
-        } else {
-            outLink.links = filterLinks(inLink.links, searchRegEx)
-            if (outLink.links.length) {
-                outLinks.push(outLink)
+            link.match = match.indices[0]
+            links.push(link)
+        } else if (link.links) {
+            link.links = filterLinks(link.links, rx)
+            if (link.links.length) {
+                links.push(link)
             }
         }
 
-        return outLinks
+        return links
     }, [])
 }
 
