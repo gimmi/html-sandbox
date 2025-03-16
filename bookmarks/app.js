@@ -29,8 +29,8 @@ export default function App() {
 
     return [
         h("fieldset", { role: "search" },
-            h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value) }),
-            h("input", { type: "button", value: "⚙", onClick: onOpenSettings })
+            h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value), autofocus: true }),
+            h("input", { type: "button", value: "⚙", onClick: onOpenSettings, tabindex: "-1" })
         ),
         ...filteredLinks.map(link => h(Link, { link })),
         h(SettingsDialog, { ref: dialogRef })
