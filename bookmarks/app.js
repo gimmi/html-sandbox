@@ -32,7 +32,9 @@ export default function App() {
             h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value), autofocus: true }),
             h("input", { type: "button", value: "⚙", onClick: onOpenSettings, tabindex: "-1" })
         ),
-        ...filteredLinks.map(link => h(Link, { link })),
+        h("div", { style: "height: calc(100vh - 150px); display: inline-flex; flex-wrap: wrap; flex-direction: column; column-gap: 1em;" },
+            filteredLinks.map(link => h(Link, { link }))
+        ),
         h(SettingsDialog, { ref: dialogRef })
     ]
 
