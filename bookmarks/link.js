@@ -1,17 +1,31 @@
 import { h, Fragment } from 'preact';
 import _ from 'lodash';
 
-export default function Link({ link }) {
-    const linkEl = link.href ? 
-        mklink() : 
-        h("span", { style: "display: block;" }, mktitle())
+export default function Link({ link, level = 0 }) {
+    const links = link?.links || []
+    const title = mktitle()
+    const favicon = mkfavicon()
+    
+    let els = [
+        Array.from({ length: level }).map(_ => h("div", { style: { padding: "0 .3em 0 .3em" }}, "❱"))
+    ]
 
-    const subLinks = link?.links || []
-    const subLinksEl = subLinks.length ?
-        h("div", { style: { paddingLeft: "1em", borderLeft: "1px dashed" }}, subLinks.map(subLink => h(Link, { link: subLink }))) :
-        null
+    if (favicon) {
+        els.push(h("img", { src: favicon, style: "width: 16px; height: 16px;" }))
+    }
 
-    return h(Fragment, {}, [ linkEl, subLinksEl ])
+    if (link.href) {
+        els.push(
+            h("a", { href: link.href, class: "secondary", target: "_blank" }, title)
+        )
+    } else {
+        els.push(title)
+    }
+
+    return [
+        h("div", { style: "display: flex; align-items: center; column-gap: .3em;" }, els),
+        links.map(link => h(Link, { link, level: level + 1 }))
+    ]
 
     function mktitle() {
         const match = link.match || [0, 0]
@@ -27,18 +41,13 @@ export default function Link({ link }) {
         return link.title
     }
 
-    function mklink() {
-        // const favicon = "https://s2.googleusercontent.com/s2/favicons?domain=" + new URL(link.href).hostname
-        const title = mktitle()
-        const favicon = link.favicon === true ? 
-            new URL(link.href).origin + "/favicon.ico" :
-            link.favicon
+    function mkfavicon() {
+        if (link.href && link.favicon === true) {
+            return new URL(link.href).origin + "/favicon.ico"
+        } else if (_.isString(link.favicon)) {
+            return link.favicon
+        }
 
-        return _.isString(favicon) ?
-            h("a", { href: link.href, class: "secondary", style: "display: flex; align-items: center; column-gap: 4px;", target: "_blank" }, 
-                h("img", { src: favicon, style: "width: 16px; height: 16px;" }),
-                h("span", {}, title)
-            ) :
-            h("a", { href: link.href, class: "secondary", style: "display: block;", target: "_blank" }, title)
+        return null
     }
 }
