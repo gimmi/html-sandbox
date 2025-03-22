@@ -7,7 +7,7 @@ export default function Link({ link, level = 0 }) {
     const favicon = mkfavicon()
     
     let els = [
-        Array.from({ length: level }).map(_ => h("div", { style: { padding: "0 .3em 0 .3em" }}, "❱"))
+        Array.from({ length: level }).map(_ => h("div", { style: { padding: "0 .3em 0 .3em" }}, "❭"))
     ]
 
     if (favicon) {
