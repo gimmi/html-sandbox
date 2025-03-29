@@ -27,12 +27,24 @@ export default function App() {
         searchTerms.reduce(reduceLinks, links) :
         links
 
+    const style = {
+        flexGrow: 1,
+        overflow: "auto",
+        display: "inline-flex",
+        flexWrap: "wrap",
+        // flexWrap: "nowrap",
+        flexDirection: "column",
+        columnGap: "var(--pico-spacing)",
+        alignContent: "flex-start",
+        paddingLeft: "var(--pico-spacing)"
+    }
+
     return [
-        h("fieldset", { role: "search" },
+        h("fieldset", { role: "search", style: "margin: 0; padding: var(--pico-spacing);" },
             h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value), autofocus: true }),
             h("input", { type: "button", value: "⚙", onClick: onOpenSettings, tabindex: "-1" })
         ),
-        h("div", { style: "flex-grow: 1; overflow: hidden; display: inline-flex; flex-wrap: wrap; flex-direction: column; column-gap: var(--pico-spacing); align-content: flex-start;" },
+        h("div", { style: style },
             filteredLinks.map(link => h(Link, { link }))
         ),
         h(SettingsDialog, { ref: dialogRef })
