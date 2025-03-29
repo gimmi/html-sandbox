@@ -59,7 +59,7 @@ export default function SettingsDialog() {
     }
 
     function onCancel() {
-        promiseCallbacks.resolve([])
+        promiseCallbacks.resolve(null)
         setPromiseCallbacks(null)
     }
 
@@ -72,7 +72,7 @@ export default function SettingsDialog() {
             localStorage.setItem('repo', repo)
             localStorage.setItem('auth', auth)
             localStorage.setItem('path', path)
-            promiseCallbacks.resolve(links)
+            promiseCallbacks.resolve({ links })
             setPromiseCallbacks(null)
         } catch (error) {
             // TODO set message in UI

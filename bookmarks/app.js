@@ -16,11 +16,12 @@ export default function App() {
         .filter(Boolean)
 
     useEffect(async () => {
-        let updatedLinks = links
-        while (updatedLinks.length === 0) {
-            updatedLinks = await dialogRef.current.openDialog()
+        if (links.length === 0) {
+            const dialogResult = await dialogRef.current.openDialog()
+            if (dialogResult) {
+                setLinks(dialogResult.links)
+            }            
         }
-        setLinks(updatedLinks)
     }, [])
 
     const filteredLinks = searchTerms.length ? 
@@ -51,9 +52,9 @@ export default function App() {
     ]
 
     async function onOpenSettings() {
-        const updatedLinks = await dialogRef.current.openDialog()
-        if (updatedLinks.length > 0) {
-            setLinks(updatedLinks)
+        const dialogResult = await dialogRef.current.openDialog()
+        if (dialogResult) {
+            setLinks(dialogResult.links)
         }
     }
 }
