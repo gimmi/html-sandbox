@@ -6,7 +6,7 @@ import Link from "./link.js"
 
 export default function App() {
     const [searchText, setSearchText] = useState("");
-    const [links, setLinks] = useLinks();
+    const [links, setLinks] = usePersistentState("links", []);
     const dialogRef = useRef(null);
 
     // TODO replace with https://github.com/farzher/fuzzysort
@@ -76,16 +76,20 @@ function reduceLinks(links, rx) {
     }, [])
 }
 
-function useLinks() {
-    const [links, setLinks] = useState(() => {
-        const cachedLinksJson = localStorage.getItem('links') || "[]"
-        return JSON.parse(cachedLinksJson)
+function usePersistentState(key, def) {
+    const [state, setState] = useState(() => {
+        const item = localStorage.getItem(key)
+        if (item) {
+            return JSON.parse(item)
+        }
+
+        return def
     })
 
-    const setAndCache = useCallback(updatedLinks => {
-        localStorage.setItem('links', JSON.stringify(updatedLinks))
-        setLinks(updatedLinks)
-    }, [links]);
+    const cacheAndSetState = useCallback(val => {
+        localStorage.setItem(key, JSON.stringify(val))
+        setState(val)
+    }, [state]);
 
-    return [links, setAndCache];
+    return [state, cacheAndSetState];
 }
