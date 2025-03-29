@@ -7,6 +7,7 @@ import Link from "./link.js"
 export default function App() {
     const [searchText, setSearchText] = useState("");
     const [links, setLinks] = usePersistentState("links", []);
+    const [flexWrap, setFlexWrap] = usePersistentState("flexWrap", "nowrap");
     const dialogRef = useRef(null);
 
     // TODO replace with https://github.com/farzher/fuzzysort
@@ -17,10 +18,7 @@ export default function App() {
 
     useEffect(async () => {
         if (links.length === 0) {
-            const dialogResult = await dialogRef.current.openDialog()
-            if (dialogResult) {
-                setLinks(dialogResult.links)
-            }            
+            await onOpenSettings()
         }
     }, [])
 
@@ -32,8 +30,7 @@ export default function App() {
         flexGrow: 1,
         overflow: "auto",
         display: "inline-flex",
-        flexWrap: "wrap",
-        // flexWrap: "nowrap",
+        flexWrap: flexWrap,
         flexDirection: "column",
         columnGap: "var(--pico-spacing)",
         alignContent: "flex-start",
@@ -52,8 +49,9 @@ export default function App() {
     ]
 
     async function onOpenSettings() {
-        const dialogResult = await dialogRef.current.openDialog()
+        const dialogResult = await dialogRef.current.openDialog({ flexWrap })
         if (dialogResult) {
+            setFlexWrap(dialogResult.flexWrap)
             setLinks(dialogResult.links)
         }
     }

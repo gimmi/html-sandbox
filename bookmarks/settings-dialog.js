@@ -11,6 +11,7 @@ export default function SettingsDialog() {
     const [repo, setRepo] = useState("");
     const [auth, setAuth] = useState("");
     const [path, setPath] = useState("");
+    const [flexWrap, setFlexWrap] = useState("nowrap");
 
     Object.assign(this, { openDialog })
 
@@ -40,13 +41,17 @@ export default function SettingsDialog() {
                     'Auth',
                     h('input', { value: auth, onInput: e => setAuth(e.currentTarget.value) }),
                     h('small', {}, "Generate a new token ", h('a', { href: "https://github.com/settings/tokens" }, "HERE"))
+                ),
+                h('select', { value: flexWrap, onInput: e => setFlexWrap(e.currentTarget.value) },
+                    h('option', { value: "wrap" }, 'Flow horizontally 🢂'),
+                    h('option', { value: "nowrap" }, 'Flow vertically 🢃')
                 )
             ),
             h('input', { type: 'button', value: 'Update', onClick: onUpdate })
         )
     )
 
-    function openDialog() {
+    function openDialog({ flexWrap }) {
         if (promiseCallbacks) throw new Error("Dialog already opened")
 
         return new Promise((resolve, reject) => {
@@ -54,6 +59,7 @@ export default function SettingsDialog() {
             setRepo(localStorage.getItem('repo') || "")
             setAuth(localStorage.getItem('auth') || "")
             setPath(localStorage.getItem('path') || "")
+            setFlexWrap(flexWrap)
             setPromiseCallbacks({ resolve, reject })
         })
     }
@@ -72,7 +78,7 @@ export default function SettingsDialog() {
             localStorage.setItem('repo', repo)
             localStorage.setItem('auth', auth)
             localStorage.setItem('path', path)
-            promiseCallbacks.resolve({ links })
+            promiseCallbacks.resolve({ links, flexWrap })
             setPromiseCallbacks(null)
         } catch (error) {
             // TODO set message in UI
