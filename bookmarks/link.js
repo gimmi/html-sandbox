@@ -43,7 +43,8 @@ export default function Link({ link, level = 0 }) {
 
     function mkfavicon() {
         if (link.href && link.favicon === true) {
-            return new URL(link.href).origin + "/favicon.ico"
+            const origin = new URL(link.href).origin
+            return `https://www.google.com/s2/favicons?domain=${origin}&sz=16`
         } else if (_.isString(link.favicon)) {
             return link.favicon
         }
