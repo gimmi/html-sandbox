@@ -73,7 +73,8 @@ export default function SettingsDialog() {
         try {
             const { rest: octokit } = new Octokit({ auth })
             const { data: file } = await octokit.repos.getContent({ owner, repo, path })
-            const links = YAML.parse(atob(file.content))
+            const yaml = decodeBase64(file.content)
+            const links = YAML.parse(yaml)
             localStorage.setItem('owner', owner)
             localStorage.setItem('repo', repo)
             localStorage.setItem('auth', auth)
@@ -84,5 +85,16 @@ export default function SettingsDialog() {
             // TODO set message in UI
             console.log(error)
         }
+    }
+
+    // https://stackoverflow.com/a/64752311/66629
+    function decodeBase64(base64) {
+        const text = atob(base64);
+        const bytes = new Uint8Array(text.length);
+        for (let i = 0; i < text.length; i++) {
+            bytes[i] = text.charCodeAt(i);
+        }
+        const decoder = new TextDecoder("utf-8");
+        return decoder.decode(bytes);
     }
 }
