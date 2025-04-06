@@ -2,7 +2,7 @@ import { h, Fragment } from 'preact';
 import _ from 'lodash';
 
 export default function Link({ link, level = 0 }) {
-    const links = link?.links || []  
+    const links = link?.links || []
 
     return [
         h("div", { style: "display: flex; align-items: center; column-gap: .3em;" }, [
@@ -45,6 +45,10 @@ export default function Link({ link, level = 0 }) {
                 h("mark", {}, link.title.slice(match[0], match[1])),
                 link.title.slice(match[1])
             ]
+        }
+
+        if (links.length) {
+            titleEl = h("b", {}, titleEl)
         }
 
         if (link.href) {
