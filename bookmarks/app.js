@@ -57,15 +57,15 @@ export default function App() {
     }
 }
 
-function reduceLinks(links, rx) {
+function reduceLinks(links, searchTerm) {
     return links.reduce((links, inLink) => {
         const link = { ...inLink }
-        const index = link.title.toLowerCase().indexOf(rx)
+        const index = link.title.toLowerCase().indexOf(searchTerm)
         if (index !== -1) {
-            link.match = [index, index + rx.length]
+            link.match = [index, index + searchTerm.length]
             links.push(link)
         } else if (link.links) {
-            link.links = reduceLinks(link.links, rx)
+            link.links = reduceLinks(link.links, searchTerm)
             if (link.links.length) {
                 links.push(link)
             }
