@@ -2,53 +2,55 @@ import { h, Fragment } from 'preact';
 import _ from 'lodash';
 
 export default function Link({ link, level = 0 }) {
-    const links = link?.links || []
-    const title = mktitle()
-    const favicon = mkfavicon()
-    
-    let els = Array.from({ length: level })
-        .map(_ => h("span", { style: { padding: "0 .3em 0 .3em" }}, "❭"))
-        
-
-    if (favicon) {
-        els.push(h("img", { src: favicon, style: "width: 16px; height: 16px;" }))
-    }
-
-    if (link.href) {
-        els.push(
-            h("a", { href: link.href, class: "secondary", target: "_blank" }, title)
-        )
-    } else {
-        els.push(title)
-    }
+    const links = link?.links || []  
 
     return [
-        h("div", { style: "display: flex; align-items: center; column-gap: .3em;" }, els),
+        h("div", { style: "display: flex; align-items: center; column-gap: .3em;" }, [
+            mkIndentEls(),
+            mkIconEl(),
+            mkTitleEl()
+        ]),
         links.map(link => h(Link, { link, level: level + 1 }))
     ]
 
-    function mktitle() {
+    function mkIndentEls() {
+        return Array.from({ length: level })
+            .map(_ => h("span", { style: "width: var(--pico-spacing); color: var(--pico-muted-color);" }, "❭"))
+    }
+
+    function mkIconEl() {
+        let src = null
+        if (link.href && link.favicon === true) {
+            const origin = new URL(link.href).origin
+            src = `https://www.google.com/s2/favicons?domain=${origin}&sz=16`
+        } else if (_.isString(link.favicon)) {
+            src = link.favicon
+        }
+
+        let el = null
+        if (src) {
+            el = h("img", { src, style: "width: 16px; height: 16px;" })
+        }
+
+        return el
+    }
+
+    function mkTitleEl() {
         const match = link.match || [0, 0]
+        let titleEl = link.title
 
         if (match[1] - match[0]) {
-            return [
+            titleEl = [
                 link.title.slice(0, match[0]),
                 h("mark", {}, link.title.slice(match[0], match[1])),
                 link.title.slice(match[1])
             ]
         }
 
-        return link.title
-    }
-
-    function mkfavicon() {
-        if (link.href && link.favicon === true) {
-            const origin = new URL(link.href).origin
-            return `https://www.google.com/s2/favicons?domain=${origin}&sz=16`
-        } else if (_.isString(link.favicon)) {
-            return link.favicon
+        if (link.href) {
+            titleEl = h("a", { href: link.href, class: "secondary", target: "_blank" }, titleEl)
         }
 
-        return null
+        return titleEl
     }
 }
