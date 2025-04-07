@@ -19,17 +19,16 @@ export default function Link({ link, level = 0 }) {
     }
 
     function mkIconEl() {
-        let src = null
-        if (link.href && link.favicon === true) {
-            const origin = new URL(link.href).origin
-            src = `https://www.google.com/s2/favicons?domain=${origin}&sz=16`
-        } else if (_.isString(link.favicon)) {
-            src = link.favicon
-        }
-
+        const style = "width: 16px; height: 16px;";
         let el = null
-        if (src) {
-            el = h("img", { src, style: "width: 16px; height: 16px;" })
+
+        if (link.favicon === true && link.href) {
+            const origin = new URL(link.href).origin
+            el = h("img", { style, src: `https://www.google.com/s2/favicons?domain=${origin}&sz=16` })
+        } else if (_.isString(link.favicon) && link.favicon.startsWith("https://")) {
+            el = h("img", { style, src: link.favicon })
+        } else if (_.isString(link.favicon)) {
+            el = h("i", { class: link.favicon })
         }
 
         return el
