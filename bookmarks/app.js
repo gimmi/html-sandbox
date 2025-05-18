@@ -3,10 +3,12 @@ import { useState, useEffect, useRef, useCallback } from 'preact/hooks';
 import _ from 'lodash';
 import SettingsDialog from "./settings-dialog.js"
 import Link from "./link.js"
+import ContextSelector from "./context-selector.js"
 
 export default function App() {
     const [searchText, setSearchText] = useState("");
-    const [links, setLinks] = usePersistentState("links", []);
+    const [contexts, setContexts] = usePersistentState("contexts", {});
+    const [context, setContext] = usePersistentState("context", "");
     const [flexWrap, setFlexWrap] = usePersistentState("flexWrap", "nowrap");
     const dialogRef = useRef(null);
 
@@ -17,12 +19,13 @@ export default function App() {
         .filter(Boolean)
 
     useEffect(async () => {
-        if (links.length === 0) {
+        if (_.isEmpty(contexts)) {
             await onOpenSettings()
         }
     }, [])
 
-    const filteredLinks = searchTerms.length ? 
+    const links = contexts[context] || []
+    const filteredLinks = searchTerms.length ?
         searchTerms.reduce(reduceLinks, links) :
         links
 
@@ -40,6 +43,7 @@ export default function App() {
     return [
         h("fieldset", { role: "search", style: "margin: 0; padding: var(--pico-spacing);" },
             h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value), autofocus: true }),
+            h(ContextSelector, { contexts, context, setContext }),
             h("input", { type: "button", value: "⚙", onClick: onOpenSettings, tabindex: "-1" })
         ),
         h("div", { style: style },
@@ -51,8 +55,9 @@ export default function App() {
     async function onOpenSettings() {
         const dialogResult = await dialogRef.current.openDialog({ flexWrap })
         if (dialogResult) {
+            setContexts(dialogResult.contexts)
+            setContext(dialogResult.context)
             setFlexWrap(dialogResult.flexWrap)
-            setLinks(dialogResult.links)
         }
     }
 }

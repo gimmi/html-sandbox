@@ -73,13 +73,14 @@ export default function SettingsDialog() {
         try {
             const { rest: octokit } = new Octokit({ auth })
             const { data: file } = await octokit.repos.getContent({ owner, repo, path })
-            const yaml = decodeBase64(file.content)
-            const links = YAML.parse(yaml)
+            const yaml = YAML.parse(decodeBase64(file.content))
+            const contexts = _.isArray(yaml) ? { "*": yaml } : yaml
+            const context = Object.keys(contexts)[0]
             localStorage.setItem('owner', owner)
             localStorage.setItem('repo', repo)
             localStorage.setItem('auth', auth)
             localStorage.setItem('path', path)
-            promiseCallbacks.resolve({ links, flexWrap })
+            promiseCallbacks.resolve({ contexts, context, flexWrap })
             setPromiseCallbacks(null)
         } catch (error) {
             // TODO set message in UI
