@@ -42,8 +42,8 @@ export default function App() {
 
     return [
         h("fieldset", { role: "search", style: "margin: 0; padding: var(--pico-spacing);" },
-            h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value), autofocus: true }),
             h(ContextSelector, { contexts, context, setContext }),
+            h("input", { type: "search", placeholder: "Search", onInput: e => setSearchText(e.target.value), autofocus: true }),
             h("input", { type: "button", value: "⚙", onClick: onOpenSettings, tabindex: "-1" })
         ),
         h("div", { style: style },
